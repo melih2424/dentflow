@@ -1825,7 +1825,11 @@ async function savePatientToSupabase(patient) {
 
 async function saveAppointmentToSupabase(appointment) {
   const { data, error } = await _supabase.from('appointments').insert([appointment]).select();
-  if (error) { console.error('Randevu kaydedilemedi:', error); return null; }
+  if (error) {
+    console.error('Randevu kaydedilemedi:', error);
+    alert('Randevu hatasi: ' + (error.message || JSON.stringify(error)));
+    return null;
+  }
   return data[0];
 }
 
@@ -2735,22 +2739,84 @@ function closeNewPatient(){
   document.getElementById('modal-patient').style.display='none';
   document.getElementById('form-patient').reset();
 }
-document.getElementById('form-patient').addEventListener('submit',function(e){
-  e.preventDefault();
-  const name=document.getElementById('np-name').value.trim();
-  const phone=document.getElementById('np-phone').value.trim();
-  const source=document.getElementById('np-source').value;
-  const service=document.getElementById('np-service').value;
-  const status=document.getElementById('np-status').value;
-  const statusMap={new_lead:{l:'Yeni Lead',c:'#eff6ff;color:#1d4ed8'},price_given:{l:'Fiyat Aldı',c:'#f5f3ff;color:#6d28d9'},appointment_pending:{l:'Randevu Bekliyor',c:'#fffbeb;color:#92400e'},appointment_booked:{l:'Randevu Aldı',c:'#eef2ff;color:#4338ca'},treatment_started:{l:'Tedavi Başladı',c:'#ecfdf5;color:#047857'}};
-  const srcColorMap={WhatsApp:'#dcfce7;color:#15803d',Instagram:'#fce7f3;color:#be185d',Facebook:'#dbeafe;color:#1d4ed8',Google:'#fee2e2;color:#b91c1c',Organik:'#f1f5f9;color:#475569'};
-  const today=new Date();
-  PATIENTS.unshift({n:name,p:phone,status,statusLabel:statusMap[status].l,statusColor:statusMap[status].c,src:source,srcColor:srcColorMap[source]||'#f1f5f9;color:#475569',s:service||'—',d:(today.getDate()+' '+'Oca Şub Mar Nis May Haz Tem Ağu Eyl Eki Kas Ara'.split(' ')[today.getMonth()])});
+async function hastaEkle() {
+  const btn = document.getElementById('btn-hasta-ekle');
+  const name    = document.getElementById('np-name').value.trim();
+  const phone   = document.getElementById('np-phone').value.trim();
+  const source  = document.getElementById('np-source').value;
+  const service = document.getElementById('np-service').value;
+  const status  = document.getElementById('np-status').value;
+  const notes   = document.getElementById('np-notes').value.trim();
+
+  if (!name) { alert('Lütfen hasta adını girin'); document.getElementById('np-name').focus(); return; }
+  if (!phone) { alert('Lütfen telefon numarasını girin'); document.getElementById('np-phone').focus(); return; }
+
+  const statusMap    = {new_lead:{l:'Yeni Lead',c:'#eff6ff;color:#1d4ed8'},price_given:{l:'Fiyat Aldı',c:'#f5f3ff;color:#6d28d9'},appointment_pending:{l:'Randevu Bekliyor',c:'#fffbeb;color:#92400e'},appointment_booked:{l:'Randevu Aldı',c:'#eef2ff;color:#4338ca'},treatment_started:{l:'Tedavi Başladı',c:'#ecfdf5;color:#047857'}};
+  const srcColorMap  = {WhatsApp:'#dcfce7;color:#15803d',Instagram:'#fce7f3;color:#be185d',Facebook:'#dbeafe;color:#1d4ed8',Google:'#fee2e2;color:#b91c1c',Organik:'#f1f5f9;color:#475569'};
+  const srcKeyMap    = {WhatsApp:'whatsapp',Instagram:'instagram',Facebook:'facebook',Google:'google_ads',Organik:'organic'};
+  const today = new Date();
+  const months = ['Oca','Sub','Mar','Nis','May','Haz','Tem','Agu','Eyl','Eki','Kas','Ara'];
+
+  if (_supabase) {
+    if (btn) { btn.disabled = true; btn.textContent = 'Kaydediliyor...'; }
+
+    // Supabase patients tablosu: id, created_at, name, phone, email
+    const insertObj = {
+      name: name,
+      phone: phone,
+    };
+    // email alanı varsa ekle (opsiyonel)
+    const emailVal = document.getElementById('np-email')?.value?.trim();
+    if (emailVal) insertObj.email = emailVal;
+
+    console.log('[DentFlow] Inserting patient:', insertObj);
+
+    const { data, error } = await _supabase.from('patients').insert([insertObj]).select();
+
+    if (btn) { btn.disabled = false; btn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Hasta Ekle'; }
+
+    if (error) {
+      alert('Kayit hatasi: ' + (error.message || JSON.stringify(error)) + '\n\nKolon: ' + JSON.stringify(insertObj));
+      return;
+    }
+
+    if (data && data[0]) {
+      const p = data[0];
+      // patients tablosu: name, phone (source/status yok - eklenebilir)
+      PATIENTS.unshift({
+        id: p.id,
+        n: p.name || name,
+        p: p.phone || phone,
+        status: status,
+        statusLabel: statusMap[status] ? statusMap[status].l : 'Yeni Lead',
+        statusColor: statusMap[status] ? statusMap[status].c : '#eff6ff;color:#1d4ed8',
+        src: source,
+        srcColor: srcColorMap[source] || '#f1f5f9;color:#475569',
+        s: service || 'belirtilmedi',
+        d: today.getDate() + ' ' + months[today.getMonth()],
+      });
+    }
+    showToast(name + ' basariyla eklendi!', 'success');
+  } else {
+    PATIENTS.unshift({
+      n: name, p: phone, status: status,
+      statusLabel: statusMap[status] ? statusMap[status].l : 'Yeni Lead',
+      statusColor: statusMap[status] ? statusMap[status].c : '#eff6ff;color:#1d4ed8',
+      src: source,
+      srcColor: srcColorMap[source] || '#f1f5f9;color:#475569',
+      s: service || 'belirtilmedi',
+      d: today.getDate() + ' ' + months[today.getMonth()],
+    });
+    showToast(name + ' eklendi (offline mod)', 'success');
+  }
+
   buildPatients();
   closeNewPatient();
-  showToast(name+' başarıyla eklendi!','success');
-  showPage('patients',document.querySelectorAll('.nav-item')[2]);
-});
+  showPage('patients', document.querySelectorAll('.nav-item')[2]);
+}
+
+// Modal dis tiklama kapama
+document.getElementById('modal-review-request') && document.getElementById('modal-review-request').addEventListener('click', function(e) { if (e.target === this) closeReviewRequestModal(); });
 
 // ── YENİ RANDEVU MODAL ──
 function openNewAppointment(){
@@ -2767,22 +2833,45 @@ function closeNewAppointment(){
   document.getElementById('modal-appointment').style.display='none';
   document.getElementById('form-appointment').reset();
 }
-document.getElementById('form-appointment').addEventListener('submit',function(e){
+document.getElementById('form-appointment').addEventListener('submit', async function(e){
   e.preventDefault();
-  const patient=document.getElementById('na-patient').value;
-  const date=document.getElementById('na-date').value;
-  const time=document.getElementById('na-time').value;
-  const service=document.getElementById('na-service-appt').value;
-  const doctor=document.getElementById('na-doctor').value;
-  const notes=document.getElementById('na-notes').value;
-  if(!patient){showToast('Lütfen hasta seçin','error');return;}
-  const d=new Date(date);
-  const months=['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
+  const patient = document.getElementById('na-patient').value;
+  const date    = document.getElementById('na-date').value;
+  const time    = document.getElementById('na-time').value;
+  const service = document.getElementById('na-service-appt').value;
+  const doctor  = document.getElementById('na-doctor').value;
+  if(!patient){showToast('Lutfen hasta secin','error');return;}
+  
+  const d = new Date(date);
+  const months = ['Oca','Sub','Mar','Nis','May','Haz','Tem','Agu','Eyl','Eki','Kas','Ara'];
+  
+  // Lokal listeye ekle (her durumda)
   APPOINTMENTS.unshift({time,date:d.getDate()+' '+months[d.getMonth()],patient,service,doctor,status:'pending',statusLabel:'Bekliyor',tc:'#92400e',tbg:'#fffbeb',bc:'#7c3aed',bbg:'#f5f3ff'});
   buildAppointments();
   closeNewAppointment();
-  showToast(patient+' için randevu oluşturuldu!','success');
   showPage('appointments',document.querySelectorAll('.nav-item')[3]);
+
+  if (_supabase) {
+    // Hasta ID'sini bul
+    const patientRecord = PATIENTS.find(p => p.n === patient);
+    
+    // appointments tablosu: patient_id, patient_name, date, time
+    const { data, error } = await _supabase.from('appointments').insert([{
+      patient_id: patientRecord?.id || null,
+      patient_name: patient,
+      date: date,
+      time: time,
+    }]).select();
+
+    if (error) {
+      console.error('Randevu hatasi:', error);
+      showToast('Randevu kaydedilemedi: ' + error.message, 'error');
+    } else {
+      showToast(patient + ' icin randevu kaydedildi!', 'success');
+    }
+  } else {
+    showToast(patient + ' icin randevu olusturuldu!', 'success');
+  }
 });
 
 // Modal dışına tıklayınca kapat
@@ -2802,7 +2891,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeNewPat
       </div>
       <button onclick="closeNewPatient()" style="width:32px;height:32px;border-radius:8px;border:1px solid #e2e8f0;background:none;font-size:18px;color:#64748b;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
     </div>
-    <form id="form-patient" style="padding:20px 24px">
+    <form id="form-patient" style="padding:20px 24px" onsubmit="return false">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
         <div>
           <label style="font-size:12px;font-weight:600;color:#475569;display:block;margin-bottom:5px">Ad Soyad <span style="color:#ef4444">*</span></label>
@@ -2846,7 +2935,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeNewPat
       </div>
       <div style="display:flex;gap:10px">
         <button type="button" onclick="closeNewPatient()" style="flex:1;padding:10px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;font-weight:600;color:#64748b;background:none;cursor:pointer">İptal</button>
-        <button type="submit" style="flex:2;padding:10px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+        <button type="button" id="btn-hasta-ekle" onclick="hastaEkle()" style="flex:2;padding:10px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           Hasta Ekle
         </button>
