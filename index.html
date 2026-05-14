@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
 <style>
 :root {
   --navy: #0f172a;
@@ -559,7 +560,7 @@ input[type=range]{width:100%;accent-color:var(--blue);cursor:pointer}
   <span id="toast-msg">İşlem başarılı!</span>
 </div>
 
-<div class="app" id="app">
+<div class="app" id="app" style="display:none">
 
 <!-- ── SIDEBAR ── -->
 <div class="sidebar" id="sidebar">
@@ -1700,6 +1701,153 @@ KLİNİK BİLGİLERİ:
 
 </div><!-- /main -->
 </div><!-- /app -->
+<!-- ── LOGIN EKRANI ── -->
+<div id="login-screen" style="display:none;position:fixed;inset:0;background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:20px;width:400px;max-width:92vw;padding:40px 36px;box-shadow:0 32px 80px rgba(0,0,0,.35)">
+    <div style="text-align:center;margin-bottom:28px">
+      <div style="width:56px;height:56px;background:linear-gradient(135deg,#2563eb,#6366f1);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" width="28" height="28"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+      </div>
+      <div style="font-size:22px;font-weight:800;color:#0f172a">DentFlow AI</div>
+      <div style="font-size:13px;color:#94a3b8;margin-top:4px">Klinik Yönetim Paneline Giriş</div>
+    </div>
+    <div id="login-error" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:12px;color:#dc2626;margin-bottom:16px;text-align:center"></div>
+    <div style="margin-bottom:14px">
+      <label style="font-size:12px;font-weight:600;color:#475569;display:block;margin-bottom:5px">E-posta</label>
+      <input id="login-email" type="email" placeholder="ornek@klinik.com" style="width:100%;padding:11px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;font-family:inherit;box-sizing:border-box" onfocus="this.style.borderColor='#2563eb'" onblur="this.style.borderColor='#e2e8f0'">
+    </div>
+    <div style="margin-bottom:22px">
+      <label style="font-size:12px;font-weight:600;color:#475569;display:block;margin-bottom:5px">Şifre</label>
+      <input id="login-password" type="password" placeholder="••••••••" style="width:100%;padding:11px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;font-family:inherit;box-sizing:border-box" onfocus="this.style.borderColor='#2563eb'" onblur="this.style.borderColor='#e2e8f0'" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button onclick="doLogin()" id="login-btn" style="width:100%;padding:13px;background:linear-gradient(135deg,#2563eb,#6366f1);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">Giriş Yap</button>
+    <div style="text-align:center;margin-top:18px">
+      <button onclick="showRegister()" style="font-size:12px;color:#2563eb;background:none;border:none;cursor:pointer;font-weight:600">Hesabın yok mu? Kayıt ol</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── KAYIT EKRANI ── -->
+<div id="register-screen" style="display:none;position:fixed;inset:0;background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:20px;width:400px;max-width:92vw;padding:40px 36px;box-shadow:0 32px 80px rgba(0,0,0,.35)">
+    <div style="text-align:center;margin-bottom:28px">
+      <div style="font-size:20px;font-weight:800;color:#0f172a">Hesap Oluştur</div>
+      <div style="font-size:13px;color:#94a3b8;margin-top:4px">DentFlow AI'ya katıl</div>
+    </div>
+    <div id="register-error" style="display:none;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:10px 14px;font-size:12px;color:#dc2626;margin-bottom:16px;text-align:center"></div>
+    <div id="register-success" style="display:none;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 14px;font-size:12px;color:#15803d;margin-bottom:16px;text-align:center"></div>
+    <div style="margin-bottom:14px">
+      <label style="font-size:12px;font-weight:600;color:#475569;display:block;margin-bottom:5px">E-posta</label>
+      <input id="reg-email" type="email" placeholder="ornek@klinik.com" style="width:100%;padding:11px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;font-family:inherit;box-sizing:border-box" onfocus="this.style.borderColor='#2563eb'" onblur="this.style.borderColor='#e2e8f0'">
+    </div>
+    <div style="margin-bottom:22px">
+      <label style="font-size:12px;font-weight:600;color:#475569;display:block;margin-bottom:5px">Şifre</label>
+      <input id="reg-password" type="password" placeholder="En az 6 karakter" style="width:100%;padding:11px 14px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;outline:none;font-family:inherit;box-sizing:border-box" onfocus="this.style.borderColor='#2563eb'" onblur="this.style.borderColor='#e2e8f0'">
+    </div>
+    <button onclick="doRegister()" id="reg-btn" style="width:100%;padding:13px;background:linear-gradient(135deg,#2563eb,#6366f1);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit">Kayıt Ol</button>
+    <div style="text-align:center;margin-top:18px">
+      <button onclick="showLogin()" style="font-size:12px;color:#2563eb;background:none;border:none;cursor:pointer;font-weight:600">Zaten hesabın var mı? Giriş yap</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://kpdsgcjcezzaptkoqklu.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwZHNnY2pjZXp6YXB0a29xa2x1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NzM1MjgsImV4cCI6MjA5NDM0OTUyOH0.O3u29s1ZAC8KBhMDahsixPg3pMEGpy-vL8a-DQUyilo';
+const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+function showLogin() {
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('register-screen').style.display = 'none';
+}
+function showRegister() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('register-screen').style.display = 'flex';
+}
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const btn = document.getElementById('login-btn');
+  const errEl = document.getElementById('login-error');
+  errEl.style.display = 'none';
+  if (!email || !password) { errEl.style.display='block'; errEl.textContent='E-posta ve sifre giriniz.'; return; }
+  btn.textContent = 'Giris yapiliyor...'; btn.disabled = true;
+  const { error } = await _supabase.auth.signInWithPassword({ email, password });
+  if (error) {
+    errEl.style.display = 'block';
+    errEl.textContent = 'E-posta veya sifre hatali.';
+    btn.textContent = 'Giris Yap'; btn.disabled = false;
+  }
+}
+
+async function doRegister() {
+  const email = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+  const btn = document.getElementById('reg-btn');
+  const errEl = document.getElementById('register-error');
+  const sucEl = document.getElementById('register-success');
+  errEl.style.display = 'none'; sucEl.style.display = 'none';
+  if (!email || !password) { errEl.style.display='block'; errEl.textContent='Tum alanlari doldurunuz.'; return; }
+  btn.textContent = 'Kayit olunuyor...'; btn.disabled = true;
+  const { error } = await _supabase.auth.signUp({ email, password });
+  if (error) {
+    errEl.style.display = 'block'; errEl.textContent = error.message;
+  } else {
+    sucEl.style.display = 'block';
+    sucEl.textContent = 'Kayit basarili! E-postanizi onaylayin, ardindan giris yapin.';
+  }
+  btn.textContent = 'Kayit Ol'; btn.disabled = false;
+}
+
+async function doLogout() {
+  await _supabase.auth.signOut();
+}
+
+async function loadSupabaseData() {
+  const { data: patients } = await _supabase.from('patients').select('*').order('created_at', { ascending: false });
+  if (patients) window.DB_PATIENTS = patients;
+  const { data: appointments } = await _supabase.from('appointments').select('*').order('date', { ascending: true });
+  if (appointments) window.DB_APPOINTMENTS = appointments;
+}
+
+async function savePatientToSupabase(patient) {
+  const { data, error } = await _supabase.from('patients').insert([patient]).select();
+  if (error) { console.error('Hasta kaydedilemedi:', error); return null; }
+  return data[0];
+}
+
+async function saveAppointmentToSupabase(appointment) {
+  const { data, error } = await _supabase.from('appointments').insert([appointment]).select();
+  if (error) { console.error('Randevu kaydedilemedi:', error); return null; }
+  return data[0];
+}
+
+async function saveMessageToSupabase(message) {
+  const { data, error } = await _supabase.from('messages').insert([message]).select();
+  if (error) { console.error('Mesaj kaydedilemedi:', error); return null; }
+  return data[0];
+}
+
+let _dashboardInited = false;
+_supabase.auth.onAuthStateChange((event, session) => {
+  if (session) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('register-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    if (!_dashboardInited) {
+      _dashboardInited = true;
+      setTimeout(() => initDashboard(), 50);
+    }
+    loadSupabaseData();
+  } else {
+    document.getElementById('app').style.display = 'none';
+    _dashboardInited = false;
+    showLogin();
+  }
+});
+<\/script>
+
 
 <script>
 const KANBAN_DATA = {
@@ -1868,9 +2016,12 @@ function buildCharts(){
   });
 }
 
-// ── INIT ──
-buildKanban();buildPatients();buildAppointments();buildCal();buildReviews();buildAutomations();buildCharts();
-document.getElementById('ai-prompt').addEventListener('input',updatePromptChars);updatePromptChars();
+// ── INIT ── (auth sonrası çağrılır)
+function initDashboard() {
+  buildKanban();buildPatients();buildAppointments();buildCal();buildReviews();buildAutomations();buildCharts();
+  const aiPrompt = document.getElementById('ai-prompt');
+  if(aiPrompt) { aiPrompt.addEventListener('input',updatePromptChars); updatePromptChars(); }
+}
 
 
 // ══════════════════════════════════════════
