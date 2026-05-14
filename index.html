@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js" onerror="window._supabaseFailed=true"></script>
 <style>
 :root {
   --navy: #0f172a;
@@ -560,7 +560,7 @@ input[type=range]{width:100%;accent-color:var(--blue);cursor:pointer}
   <span id="toast-msg">İşlem başarılı!</span>
 </div>
 
-<div class="app" id="app" style="display:none">
+<div class="app" id="app">
 
 <!-- ── SIDEBAR ── -->
 <div class="sidebar" id="sidebar">
@@ -1754,7 +1754,13 @@ KLİNİK BİLGİLERİ:
 <script>
 const SUPABASE_URL = 'https://kpdsgcjcezzaptkoqklu.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwZHNnY2pjZXp6YXB0a29xa2x1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NzM1MjgsImV4cCI6MjA5NDM0OTUyOH0.O3u29s1ZAC8KBhMDahsixPg3pMEGpy-vL8a-DQUyilo';
-const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+let _supabase;
+try {
+  _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+} catch(e) {
+  console.warn('Supabase could not be initialized:', e);
+  _supabase = null;
+}
 
 function showLogin() {
   document.getElementById('login-screen').style.display = 'flex';
@@ -1830,23 +1836,35 @@ async function saveMessageToSupabase(message) {
 }
 
 let _dashboardInited = false;
-_supabase.auth.onAuthStateChange((event, session) => {
-  if (session) {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('register-screen').style.display = 'none';
-    document.getElementById('app').style.display = 'flex';
-    if (!_dashboardInited) {
-      _dashboardInited = true;
-      setTimeout(() => initDashboard(), 50);
-    }
-    loadSupabaseData();
+
+function startApp() {
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('register-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  if (!_dashboardInited) {
+    _dashboardInited = true;
+    setTimeout(() => initDashboard(), 50);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  if (_supabase) {
+    _supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('register-screen').style.display = 'none';
+        if (!_dashboardInited) { _dashboardInited = true; initDashboard(); }
+        loadSupabaseData();
+      } else {
+        showLogin();
+      }
+    });
   } else {
-    document.getElementById('app').style.display = 'none';
-    _dashboardInited = false;
-    showLogin();
+    // Supabase yoksa direkt dashboard aç
+    initDashboard();
   }
 });
-<\/script>
+</script>
 
 
 <script>
