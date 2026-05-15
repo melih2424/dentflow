@@ -1817,7 +1817,9 @@ async function doLogout() {
 async function loadSupabaseData() {
   if (!_supabase) return;
   try {
-    const { data: patients, error: pErr } = await _supabase.from('patients').select('*').order('created_at', {ascending: false});
+    const { data: { user } } = await _supabase.auth.getUser();
+    if (!user) return;
+    const { data: patients, error: pErr } = await _supabase.from('patients').select('*').eq('user_id', user.id).order('created_at', {ascending: false});
     if (pErr) { console.error('Hata:', pErr); return; }
     if (patients && patients.length > 0) {
       const statusMap = {new_lead:{l:'Yeni Lead',c:'#eff6ff;color:#1d4ed8'},price_given:{l:'Fiyat Aldi',c:'#f5f3ff;color:#6d28d9'},appointment_pending:{l:'Randevu Bekliyor',c:'#fffbeb;color:#92400e'},appointment_booked:{l:'Randevu Aldi',c:'#eef2ff;color:#4338ca'},treatment_started:{l:'Tedavi Basladi',c:'#ecfdf5;color:#047857'},review_done:{l:'Yorum Yapti',c:'#f0fdf4;color:#15803d'}};
@@ -2805,9 +2807,11 @@ async function hastaEkle() {
     if (btn) { btn.disabled = true; btn.textContent = 'Kaydediliyor...'; }
 
     // Supabase patients tablosu: id, created_at, name, phone, email
+    const { data: { user: currentUser } } = await _supabase.auth.getUser();
     const insertObj = {
       name: name,
       phone: phone,
+      user_id: currentUser?.id || null,
     };
     // email alanı varsa ekle (opsiyonel)
     const emailVal = document.getElementById('np-email')?.value?.trim();
@@ -2905,6 +2909,10 @@ document.getElementById('form-appointment').addEventListener('submit', async fun
       patient_name: patient,
       date: date,
       time: time,
+      service_type: service,
+      doctor_name: doctor,
+      status: 'pending',
+      user_id: (await _supabase.auth.getUser()).data.user?.id || null,
     }]).select();
 
     if (error) {
