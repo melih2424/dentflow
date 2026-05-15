@@ -1784,7 +1784,11 @@ async function doLogin() {
     errEl.style.display = 'block';
     errEl.textContent = 'E-posta veya sifre hatali.';
     btn.textContent = 'Giris Yap'; btn.disabled = false;
-  }
+    } else {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('app').style.display = 'flex';
+      initDashboard();
+    }
 }
 
 async function doRegister() {
