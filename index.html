@@ -2085,11 +2085,10 @@ function goToday() {
 
 function selectDay(year, month, day) {
   selectedDate = new Date(year, month, day);
-  renderCalendar();
-  // Mini cal güncelle
-  miniCalYear = month;
+  selectedDate.setHours(0,0,0,0);
+  miniCalYear = year;
   miniCalMonth = month;
-  buildMiniCal();
+  renderCalendar();
 }
 
 function renderCalendar() {
@@ -3184,7 +3183,6 @@ document.getElementById('form-appointment').addEventListener('submit', async fun
   APPOINTMENTS.unshift({time,date:d.getDate()+' '+months[d.getMonth()],patient,service,doctor,status:'pending',statusLabel:'Bekliyor',tc:'#92400e',tbg:'#fffbeb',bc:'#7c3aed',bbg:'#f5f3ff'});
   buildAppointments();
   closeNewAppointment();
-  showPage('appointments',document.querySelectorAll('.nav-item')[3]);
 
   if (_supabase) {
     // Hasta ID'sini bul
