@@ -1906,7 +1906,27 @@ const PATIENTS = [
 function buildPatients(filter=''){
   const tbody=document.getElementById('patients-table');
   const filtered=PATIENTS.filter(p=>!filter||p.n.toLowerCase().includes(filter.toLowerCase())||p.s.toLowerCase().includes(filter.toLowerCase()));
-  tbody.innerHTML=filtered.map(p=>`<tr><td><div style="font-weight:600">${p.n}</div></td><td style="color:var(--text3)">${p.p}</td><td><span class="status-badge" style="background:${p.statusColor}">${p.statusLabel}</span></td><td><span class="source-badge" style="background:${p.srcColor}">${p.src}</span></td><td>${p.s}</td><td style="color:var(--text3)">${p.d}</td><td><div class="action-btns"><button class="action-btn" onclick="showToast('Hasta detayı açıldı')" title="Detay"><svg viewBox='0 0 24 24' fill='none' stroke='currentColor'><path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/><circle cx='12' cy='12' r='3'/></svg></button><button class="action-btn" onclick="showToast('WhatsApp açılıyor...')" title="Mesaj gönder"><svg viewBox='0 0 24 24' fill='none' stroke='currentColor'><path d='M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z'/></svg></button><button class="action-btn" onclick="showToast('Randevu oluşturuluyor...')" title="Randevu ekle"><svg viewBox='0 0 24 24' fill='none' stroke='currentColor'><rect x='3' y='4' width='18' height='18' rx='2'/><path d='M16 2v4M8 2v4M3 10h18'/></svg></button></div></td></tr>`).join('');
+  tbody.innerHTML=filtered.map((p,i)=>`<tr style="cursor:pointer" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background=''">
+  <td onclick="openPatientDetail(${i})" style="font-weight:600;color:var(--text)">${p.n}</td>
+  <td onclick="openPatientDetail(${i})" style="color:var(--text3)">${p.p}</td>
+  <td onclick="openPatientDetail(${i})"><span class="status-badge" style="background:${p.statusColor}">${p.statusLabel}</span></td>
+  <td onclick="openPatientDetail(${i})"><span class="source-badge" style="background:${p.srcColor}">${p.src}</span></td>
+  <td onclick="openPatientDetail(${i})">${p.s}</td>
+  <td onclick="openPatientDetail(${i})" style="color:var(--text3)">${p.d}</td>
+  <td>
+    <div class="action-btns">
+      <button class="action-btn" onclick="openPatientDetail(${i})" title="Hasta Detayını Görüntüle" style="position:relative">
+        <svg viewBox='0 0 24 24' fill='none' stroke='currentColor'><path d='M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z'/><circle cx='12' cy='12' r='3'/></svg>
+      </button>
+      <button class="action-btn" onclick="openWhatsApp('${p.p}')" title="WhatsApp ile Mesaj Gönder" style="color:#22c55e">
+        <svg viewBox='0 0 24 24' fill='none' stroke='currentColor'><path d='M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z'/></svg>
+      </button>
+      <button class="action-btn" onclick="openNewAppointmentForPatient('${p.n}','${p.p}')" title="Yeni Randevu Olustur" style="color:#6366f1">
+        <svg viewBox='0 0 24 24' fill='none' stroke='currentColor'><rect x='3' y='4' width='18' height='18' rx='2'/><path d='M16 2v4M8 2v4M3 10h18'/><line x1='12' y1='14' x2='12' y2='18'/><line x1='10' y1='16' x2='14' y2='16'/></svg>
+      </button>
+    </div>
+  </td>
+</tr>`).join('');
 }
 function filterPatients(v){buildPatients(v)}
 
@@ -3302,6 +3322,351 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
+});
+</script>
+
+
+<!-- ── HASTA DETAY MODAL ── -->
+<div id="modal-patient-detail" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:600;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
+  <div style="background:#fff;border-radius:16px;width:640px;max-width:96vw;max-height:92vh;box-shadow:0 24px 64px rgba(0,0,0,.2);overflow:hidden;display:flex;flex-direction:column">
+    
+    <!-- Header -->
+    <div style="padding:18px 24px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:14px;flex-shrink:0">
+      <div id="pd-avatar" style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">AK</div>
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div id="pd-name" style="font-size:17px;font-weight:800;color:#0f172a">Hasta Adı</div>
+          <button onclick="togglePatientEdit()" id="pd-edit-btn" style="font-size:11px;font-weight:600;color:#2563eb;background:#eff6ff;border:1px solid #bfdbfe;border-radius:5px;padding:2px 8px;cursor:pointer">Düzenle</button>
+        </div>
+        <div id="pd-phone" style="font-size:12px;color:#94a3b8;margin-top:2px">+90 5xx xxx xxxx</div>
+      </div>
+      <button onclick="closePatientDetail()" style="width:32px;height:32px;border-radius:8px;border:1px solid #e2e8f0;background:none;font-size:18px;color:#64748b;cursor:pointer">✕</button>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div style="display:flex;border-bottom:1px solid #e2e8f0;flex-shrink:0;padding:0 24px">
+      <button onclick="switchPdTab('info')" id="pd-tab-info" style="padding:10px 16px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid #2563eb;color:#2563eb">Hasta Bilgisi</button>
+      <button onclick="switchPdTab('history')" id="pd-tab-history" style="padding:10px 16px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;color:#94a3b8">İşlem Geçmişi</button>
+      <button onclick="switchPdTab('edit')" id="pd-tab-edit" style="padding:10px 16px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;color:#94a3b8">Bilgileri Güncelle</button>
+    </div>
+
+    <!-- Tab: Hasta Bilgisi -->
+    <div id="pd-panel-info" style="padding:20px 24px;overflow-y:auto;flex:1">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+        <div style="background:#f8fafc;border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:4px">Durum</div>
+          <div id="pd-status" style="font-size:12px;font-weight:700;padding:4px 10px;border-radius:5px;display:inline-block">Yeni Lead</div>
+        </div>
+        <div style="background:#f8fafc;border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:4px">Kaynak</div>
+          <div id="pd-source" style="font-size:12px;font-weight:700;padding:4px 10px;border-radius:5px;display:inline-block">WhatsApp</div>
+        </div>
+        <div style="background:#f8fafc;border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:4px">Kayıt Tarihi</div>
+          <div id="pd-date" style="font-size:12px;font-weight:700;color:#0f172a">15 May</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:6px">İlgilendiği Hizmet</div>
+        <div id="pd-service" style="font-size:14px;font-weight:600;color:#0f172a;background:#f8fafc;padding:10px 14px;border-radius:8px">—</div>
+      </div>
+
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:6px">Notlar</div>
+        <div id="pd-notes" style="font-size:13px;color:#475569;background:#f8fafc;padding:10px 14px;border-radius:8px;min-height:50px;line-height:1.6">—</div>
+      </div>
+
+      <div>
+        <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:6px">Durumu Güncelle</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button onclick="updatePatientStatus('new_lead')" style="padding:5px 10px;border-radius:6px;border:1px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700;cursor:pointer">Yeni Lead</button>
+          <button onclick="updatePatientStatus('price_given')" style="padding:5px 10px;border-radius:6px;border:1px solid #ddd6fe;background:#f5f3ff;color:#6d28d9;font-size:11px;font-weight:700;cursor:pointer">Fiyat Aldı</button>
+          <button onclick="updatePatientStatus('appointment_pending')" style="padding:5px 10px;border-radius:6px;border:1px solid #fde68a;background:#fffbeb;color:#92400e;font-size:11px;font-weight:700;cursor:pointer">Randevu Bekliyor</button>
+          <button onclick="updatePatientStatus('appointment_booked')" style="padding:5px 10px;border-radius:6px;border:1px solid #c7d2fe;background:#eef2ff;color:#4338ca;font-size:11px;font-weight:700;cursor:pointer">Randevu Aldı</button>
+          <button onclick="updatePatientStatus('treatment_started')" style="padding:5px 10px;border-radius:6px;border:1px solid #bbf7d0;background:#ecfdf5;color:#047857;font-size:11px;font-weight:700;cursor:pointer">Tedavi Başladı</button>
+          <button onclick="updatePatientStatus('review_done')" style="padding:5px 10px;border-radius:6px;border:1px solid #f9a8d4;background:#fdf2f8;color:#be185d;font-size:11px;font-weight:700;cursor:pointer">Yorum Yaptı</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: İşlem Geçmişi -->
+    <div id="pd-panel-history" style="display:none;padding:20px 24px;overflow-y:auto;flex:1">
+      <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:12px">Son İşlemler ve Randevular</div>
+      <div id="pd-history-list"></div>
+      
+      <div style="margin-top:20px">
+        <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:10px">Yeni İşlem / Tedavi Ekle</div>
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <select id="pd-treatment-type" style="flex:1;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:12px;outline:none;background:#fff;cursor:pointer">
+            <option value="">Tedavi seçin...</option>
+            <option>İmplant</option><option>Porselen Kron</option><option>Zirkonyum</option>
+            <option>Diş Beyazlatma</option><option>Kanal Tedavisi</option><option>Ortodonti</option>
+            <option>Gömülü Diş</option><option>Diş Kaplama</option><option>Genel Kontrol</option>
+            <option>Diş Çekimi</option><option>Dolgu</option>
+          </select>
+          <input id="pd-treatment-note" placeholder="Not (opsiyonel)" style="flex:2;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:12px;outline:none;font-family:inherit">
+        </div>
+        <button onclick="addTreatmentRecord()" style="width:100%;padding:9px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">
+          + İşlem Kaydet
+        </button>
+      </div>
+    </div>
+
+    <!-- Tab: Bilgileri Güncelle -->
+    <div id="pd-panel-edit" style="display:none;padding:20px 24px;overflow-y:auto;flex:1">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div>
+          <label style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;display:block;margin-bottom:5px">Ad Soyad</label>
+          <input id="pd-edit-name" style="width:100%;padding:9px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;font-family:inherit" onfocus="this.style.borderColor='#2563eb'" onblur="this.style.borderColor='#e2e8f0'">
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;display:block;margin-bottom:5px">Telefon</label>
+          <input id="pd-edit-phone" style="width:100%;padding:9px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;font-family:inherit" onfocus="this.style.borderColor='#2563eb'" onblur="this.style.borderColor='#e2e8f0'">
+        </div>
+      </div>
+      <div style="margin-bottom:12px">
+        <label style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;display:block;margin-bottom:5px">İlgilendiği Hizmet</label>
+        <select id="pd-edit-service" style="width:100%;padding:9px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;background:#fff;cursor:pointer">
+          <option value="">Seçin...</option>
+          <option>İmplant</option><option>Porselen Kron</option><option>Zirkonyum</option>
+          <option>Diş Beyazlatma</option><option>Kanal Tedavisi</option><option>Ortodonti</option>
+          <option>Gömülü Diş</option><option>Diş Kaplama</option><option>Genel Kontrol</option>
+        </select>
+      </div>
+      <div style="margin-bottom:16px">
+        <label style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;display:block;margin-bottom:5px">Notlar</label>
+        <textarea id="pd-edit-notes" rows="3" style="width:100%;padding:9px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;resize:none;font-family:inherit;line-height:1.5" onfocus="this.style.borderColor='#2563eb'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
+      </div>
+      <button onclick="savePatientEdit()" style="width:100%;padding:10px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">
+        Değişiklikleri Kaydet
+      </button>
+    </div>
+
+    <!-- Footer -->
+    <div style="padding:12px 24px;border-top:1px solid #e2e8f0;display:flex;gap:10px;flex-shrink:0">
+      <button onclick="openWhatsApp(currentPatient?.p)" style="flex:1;padding:9px;background:#22c55e;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+        WhatsApp
+      </button>
+      <button onclick="openNewAppointmentForPatient(currentPatient?.n, currentPatient?.p);closePatientDetail()" style="flex:1;padding:9px;background:#6366f1;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>
+        Randevu
+      </button>
+      <button onclick="closePatientDetail()" style="padding:9px 14px;border:1px solid #e2e8f0;border-radius:8px;font-size:12px;font-weight:600;color:#64748b;background:none;cursor:pointer">Kapat</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+let currentPatient = null;
+let currentPatientIdx = -1;
+
+function switchPdTab(tab) {
+  ['info','history','edit'].forEach(t => {
+    document.getElementById('pd-panel-' + t).style.display = t === tab ? 'block' : 'none';
+    const btn = document.getElementById('pd-tab-' + t);
+    btn.style.borderBottomColor = t === tab ? '#2563eb' : 'transparent';
+    btn.style.color = t === tab ? '#2563eb' : '#94a3b8';
+  });
+  if (tab === 'history') loadPatientHistory();
+  if (tab === 'edit') fillEditForm();
+}
+
+function openPatientDetail(idx) {
+  const p = PATIENTS[idx];
+  if (!p) return;
+  currentPatient = p;
+  currentPatientIdx = idx;
+
+  const initials = p.n.split(' ').map(w => w[0]).slice(0,2).join('').toUpperCase();
+  document.getElementById('pd-avatar').textContent = initials;
+  document.getElementById('pd-name').textContent = p.n;
+  document.getElementById('pd-phone').textContent = p.p || '—';
+  document.getElementById('pd-service').textContent = p.s || '—';
+  document.getElementById('pd-notes').textContent = p.notes || '—';
+  document.getElementById('pd-date').textContent = p.d || '—';
+
+  const statusEl = document.getElementById('pd-status');
+  statusEl.textContent = p.statusLabel || 'Yeni Lead';
+  const sc = p.statusColor || '#eff6ff;color:#1d4ed8';
+  statusEl.style.cssText = 'font-size:12px;font-weight:700;padding:4px 10px;border-radius:5px;display:inline-block;background:' + sc.split(';')[0] + ';color:' + (sc.split('color:')[1] || '#1d4ed8');
+
+  const srcEl = document.getElementById('pd-source');
+  srcEl.textContent = p.src || 'WhatsApp';
+  const srcc = p.srcColor || '#dcfce7;color:#15803d';
+  srcEl.style.cssText = 'font-size:12px;font-weight:700;padding:4px 10px;border-radius:5px;display:inline-block;background:' + srcc.split(';')[0] + ';color:' + (srcc.split('color:')[1] || '#15803d');
+
+  switchPdTab('info');
+  document.getElementById('modal-patient-detail').style.display = 'flex';
+}
+
+function closePatientDetail() {
+  document.getElementById('modal-patient-detail').style.display = 'none';
+  currentPatient = null;
+}
+
+async function loadPatientHistory() {
+  const list = document.getElementById('pd-history-list');
+  if (!currentPatient) return;
+
+  // Randevuları filtrele
+  const appts = APPOINTMENTS.filter(a => a.patient === currentPatient.n);
+  
+  // Supabase'den de çek
+  let supabaseAppts = [];
+  if (_supabase && currentPatient.id) {
+    const { data } = await _supabase.from('appointments')
+      .select('*').eq('patient_id', currentPatient.id).order('created_at', {ascending: false});
+    if (data) supabaseAppts = data;
+  }
+
+  // Tedavi geçmişi (local storage'dan)
+  const treatments = currentPatient.treatments || [];
+
+  if (appts.length === 0 && supabaseAppts.length === 0 && treatments.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:24px;color:#94a3b8;font-size:13px">Henüz işlem kaydı yok</div>';
+    return;
+  }
+
+  let html = '';
+  
+  // Tedaviler
+  treatments.forEach(t => {
+    html += `<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #f1f5f9">
+      <div style="width:8px;height:8px;background:#6366f1;border-radius:50%;margin-top:5px;flex-shrink:0"></div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600;color:#0f172a">${t.type}</div>
+        ${t.note ? `<div style="font-size:12px;color:#64748b;margin-top:2px">${t.note}</div>` : ''}
+        <div style="font-size:11px;color:#94a3b8;margin-top:2px">${t.date}</div>
+      </div>
+      <span style="font-size:10px;font-weight:700;padding:2px 7px;background:#f5f3ff;color:#6d28d9;border-radius:4px">Tedavi</span>
+    </div>`;
+  });
+
+  // Supabase randevuları
+  supabaseAppts.forEach(a => {
+    html += `<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #f1f5f9">
+      <div style="width:8px;height:8px;background:#2563eb;border-radius:50%;margin-top:5px;flex-shrink:0"></div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600;color:#0f172a">${a.service_type || 'Randevu'}</div>
+        <div style="font-size:12px;color:#64748b;margin-top:2px">Dr. ${a.doctor_name || 'Güler'} · ${a.time || ''}</div>
+        <div style="font-size:11px;color:#94a3b8;margin-top:2px">${a.date || ''}</div>
+      </div>
+      <span style="font-size:10px;font-weight:700;padding:2px 7px;background:#eff6ff;color:#1d4ed8;border-radius:4px">Randevu</span>
+    </div>`;
+  });
+
+  // Local randevular
+  appts.forEach(a => {
+    html += `<div style="display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #f1f5f9">
+      <div style="width:8px;height:8px;background:#10b981;border-radius:50%;margin-top:5px;flex-shrink:0"></div>
+      <div style="flex:1">
+        <div style="font-size:13px;font-weight:600;color:#0f172a">${a.service}</div>
+        <div style="font-size:12px;color:#64748b;margin-top:2px">Dr. ${a.doctor} · ${a.time}</div>
+        <div style="font-size:11px;color:#94a3b8;margin-top:2px">${a.date}</div>
+      </div>
+      <span style="font-size:10px;font-weight:700;padding:2px 7px;background:#ecfdf5;color:#047857;border-radius:4px">Randevu</span>
+    </div>`;
+  });
+
+  list.innerHTML = html || '<div style="text-align:center;padding:24px;color:#94a3b8;font-size:13px">Kayıt bulunamadı</div>';
+}
+
+function addTreatmentRecord() {
+  const type = document.getElementById('pd-treatment-type').value;
+  const note = document.getElementById('pd-treatment-note').value.trim();
+  if (!type) { showToast('Tedavi türü seçin', 'error'); return; }
+  if (!currentPatient.treatments) currentPatient.treatments = [];
+  const now = new Date();
+  const months = ['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara'];
+  currentPatient.treatments.unshift({ type, note, date: now.getDate() + ' ' + months[now.getMonth()] + ' ' + now.getFullYear() });
+  document.getElementById('pd-treatment-type').value = '';
+  document.getElementById('pd-treatment-note').value = '';
+  loadPatientHistory();
+  showToast(type + ' kaydedildi', 'success');
+}
+
+function fillEditForm() {
+  if (!currentPatient) return;
+  document.getElementById('pd-edit-name').value = currentPatient.n || '';
+  document.getElementById('pd-edit-phone').value = currentPatient.p || '';
+  document.getElementById('pd-edit-notes').value = currentPatient.notes || '';
+  const svc = document.getElementById('pd-edit-service');
+  for (let i = 0; i < svc.options.length; i++) {
+    if (svc.options[i].value === currentPatient.s) { svc.selectedIndex = i; break; }
+  }
+}
+
+async function savePatientEdit() {
+  const name = document.getElementById('pd-edit-name').value.trim();
+  const phone = document.getElementById('pd-edit-phone').value.trim();
+  const service = document.getElementById('pd-edit-service').value;
+  const notes = document.getElementById('pd-edit-notes').value.trim();
+  if (!name) { showToast('Ad Soyad boş olamaz', 'error'); return; }
+
+  currentPatient.n = name;
+  currentPatient.p = phone;
+  currentPatient.s = service || currentPatient.s;
+  currentPatient.notes = notes;
+
+  if (_supabase && currentPatient.id) {
+    const updateObj = { name, phone };
+    if (service) updateObj.interested_service = service;
+    if (notes) updateObj.notes = notes;
+    const { error } = await _supabase.from('patients').update(updateObj).eq('id', currentPatient.id);
+    if (error) { showToast('Kayıt hatası: ' + error.message, 'error'); return; }
+  }
+
+  buildPatients();
+  // Refresh header
+  document.getElementById('pd-name').textContent = name;
+  document.getElementById('pd-phone').textContent = phone || '—';
+  document.getElementById('pd-service').textContent = service || currentPatient.s || '—';
+  document.getElementById('pd-notes').textContent = notes || '—';
+  document.getElementById('pd-avatar').textContent = name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+  showToast('Hasta bilgileri güncellendi!', 'success');
+  switchPdTab('info');
+}
+
+async function updatePatientStatus(newStatus) {
+  if (!currentPatient) return;
+  const statusMap = {new_lead:{l:'Yeni Lead',c:'#eff6ff;color:#1d4ed8'},price_given:{l:'Fiyat Aldı',c:'#f5f3ff;color:#6d28d9'},appointment_pending:{l:'Randevu Bekliyor',c:'#fffbeb;color:#92400e'},appointment_booked:{l:'Randevu Aldı',c:'#eef2ff;color:#4338ca'},treatment_started:{l:'Tedavi Başladı',c:'#ecfdf5;color:#047857'},review_done:{l:'Yorum Yaptı',c:'#f0fdf4;color:#15803d'}};
+  const st = statusMap[newStatus];
+  currentPatient.status = newStatus;
+  currentPatient.statusLabel = st.l;
+  currentPatient.statusColor = st.c;
+  if (_supabase && currentPatient.id) {
+    const { error } = await _supabase.from('patients').update({ status: newStatus }).eq('id', currentPatient.id);
+    if (error) { showToast('Güncelleme hatası: ' + error.message, 'error'); return; }
+  }
+  buildPatients();
+  openPatientDetail(currentPatientIdx);
+  showToast('Durum güncellendi: ' + st.l, 'success');
+}
+
+function openWhatsApp(phone) {
+  if (!phone) { showToast('Telefon numarası yok', 'error'); return; }
+  const clean = phone.replace(/[^0-9]/g, '');
+  const num = clean.startsWith('90') ? clean : '90' + clean.replace(/^0/, '');
+  window.open('https://wa.me/' + num, '_blank');
+}
+
+function openNewAppointmentForPatient(name, phone) {
+  openNewAppointment();
+  setTimeout(() => {
+    const sel = document.getElementById('na-patient');
+    if (sel) {
+      for (let i = 0; i < sel.options.length; i++) {
+        if (sel.options[i].value === name) { sel.selectedIndex = i; break; }
+      }
+    }
+  }, 100);
+}
+
+document.getElementById('modal-patient-detail').addEventListener('click', function(e) {
+  if (e.target === this) closePatientDetail();
 });
 </script>
 
