@@ -1877,7 +1877,11 @@ document.addEventListener('DOMContentLoaded', function() {
       if (session) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('register-screen').style.display = 'none';
-        if (!_dashboardInited) { _dashboardInited = true; initDashboard(); }
+        if (!_dashboardInited) { 
+          _dashboardInited = true; 
+          initDashboard();
+          setTimeout(() => loadSupabaseData(), 500);
+        }
       } else {
         showLogin();
       }
