@@ -3073,6 +3073,57 @@ function closeNewPatient(){
   document.getElementById('modal-patient').style.display='none';
   document.getElementById('form-patient').reset();
 }
+
+async function randevuOlustur() {
+  const patient = document.getElementById('na-patient').value;
+  const date    = document.getElementById('na-date').value;
+  const time    = document.getElementById('na-time').value;
+  const service = document.getElementById('na-service-appt').value;
+  const doctor  = document.getElementById('na-doctor').value;
+
+  if (!patient) { showToast('Lutfen hasta secin', 'error'); return; }
+  if (!date)    { showToast('Lutfen tarih secin', 'error'); return; }
+  if (!time)    { showToast('Lutfen saat secin', 'error'); return; }
+
+  const dateObj = new Date(date);
+  const months = ['Oca','Sub','Mar','Nis','May','Haz','Tem','Agu','Eyl','Eki','Kas','Ara'];
+
+  // Lokal listeye ekle
+  APPOINTMENTS.unshift({
+    patient, service, doctor, time,
+    date: date,
+    dateObj: dateObj,
+    status: 'pending', statusLabel: 'Bekliyor',
+    tc: '#92400e', tbg: '#fffbeb', bc: '#7c3aed', bbg: '#f5f3ff'
+  });
+
+  // Modalı kapat - sayfa değişmeden
+  closeNewAppointment();
+  
+  // Takvimi güncelle
+  if (typeof renderCalendar === 'function') renderCalendar();
+
+  // Supabase'e kaydet
+  if (_supabase) {
+    const patientRecord = PATIENTS.find(p => p.n === patient);
+    const { data: { user } } = await _supabase.auth.getUser();
+    const { error } = await _supabase.from('appointments').insert([{
+      patient_id: patientRecord?.id || null,
+      patient_name: patient,
+      date: date,
+      time: time,
+      service_type: service,
+      doctor_name: doctor,
+      status: 'pending',
+      user_id: user?.id || null,
+    }]);
+    if (error) { showToast('Randevu hatasi: ' + error.message, 'error'); }
+    else { showToast(patient + ' icin randevu kaydedildi!', 'success'); }
+  } else {
+    showToast(patient + ' icin randevu olusturuldu!', 'success');
+  }
+}
+
 async function hastaEkle() {
   const btn = document.getElementById('btn-hasta-ekle');
   const name    = document.getElementById('np-name').value.trim();
