@@ -1410,164 +1410,120 @@ KLİNİK BİLGİLERİ:
        WHATSAPP TAKİP PANELİ
   ════════════════════════════════ -->
   <div class="page" id="page-whatsapp">
-    <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:12px">
       <div>
-        <div class="page-title">WhatsApp Takip Paneli</div>
-        <div class="page-subtitle">Canlı konuşmalar ve mesaj onay sistemi</div>
+        <div class="page-title">WhatsApp Takip</div>
+        <div class="page-subtitle">Canli konusmalar ve AI yanit sistemi</div>
       </div>
-      <div style="display:flex;gap:10px;align-items:center">
-        <div style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:#dcfce7;border:1px solid #bbf7d0;border-radius:20px;font-size:12px;font-weight:700;color:#15803d">
-          <span style="width:7px;height:7px;background:#22c55e;border-radius:50%;animation:pulse 2s infinite;display:inline-block"></span>
+      <div style="display:flex;gap:8px;align-items:center">
+        <div style="display:flex;align-items:center;gap:6px;padding:5px 12px;background:#dcfce7;border:1px solid #bbf7d0;border-radius:20px;font-size:11px;font-weight:700;color:#15803d">
+          <span style="width:6px;height:6px;background:#22c55e;border-radius:50%;animation:pulse 2s infinite;display:inline-block"></span>
           AI Aktif
         </div>
-        <button class="btn-primary" onclick="showToast('Toplu mesaj paneli açıldı')">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="15" height="15"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+        <button style="display:flex;align-items:center;gap:6px;padding:8px 14px;background:#22c55e;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer" onclick="showToast('Toplu mesaj paneli acildi')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
           Toplu Mesaj
         </button>
       </div>
     </div>
 
-    <!-- WhatsApp Bağlantı Durumu Kartı -->
-    <div id="wa-setup-card" style="background:linear-gradient(135deg,#f0fdf4,#dcfce7);border:1px solid #bbf7d0;border-radius:14px;padding:20px 24px;margin-bottom:20px">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
-        <div style="display:flex;align-items:center;gap:14px">
-          <div style="width:48px;height:48px;background:#22c55e;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" width="26" height="26"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
-          </div>
-          <div>
-            <div style="font-size:15px;font-weight:800;color:#14532d">WhatsApp Business API Bağlantısı</div>
-            <div style="font-size:12px;color:#16a34a;margin-top:2px">Meta Cloud API üzerinden resmi entegrasyon</div>
-          </div>
-        </div>
-        <div id="wa-connected-badge" style="display:none;align-items:center;gap:6px;padding:7px 14px;background:#15803d;color:#fff;border-radius:20px;font-size:12px;font-weight:700">
-          <span style="width:7px;height:7px;background:#86efac;border-radius:50%"></span>
-          Bağlı · +90 532 123 4567
-        </div>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px" id="wa-setup-steps">
-        <!-- Adım 1 -->
-        <div style="background:#fff;border-radius:10px;padding:14px;border:1px solid #bbf7d0">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-            <div style="width:24px;height:24px;background:#22c55e;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:800;flex-shrink:0">1</div>
-            <span style="font-size:12px;font-weight:700;color:#14532d">Meta Business</span>
-          </div>
-          <p style="font-size:11px;color:#475569;margin-bottom:10px;line-height:1.5">Facebook Business Manager hesabınızı ve WhatsApp Business hesabınızı bağlayın.</p>
-          <input id="wa-business-id" placeholder="Business Account ID" style="width:100%;padding:7px 10px;border:1px solid #d1fae5;border-radius:7px;font-size:11px;outline:none;margin-bottom:6px;font-family:inherit" onfocus="this.style.borderColor='#22c55e'" onblur="this.style.borderColor='#d1fae5'">
-          <a href="https://business.facebook.com" target="_blank" style="font-size:11px;color:#16a34a;font-weight:600;text-decoration:none">business.facebook.com ↗</a>
-        </div>
-        <!-- Adım 2 -->
-        <div style="background:#fff;border-radius:10px;padding:14px;border:1px solid #bbf7d0">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-            <div style="width:24px;height:24px;background:#22c55e;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:800;flex-shrink:0">2</div>
-            <span style="font-size:12px;font-weight:700;color:#14532d">API Bilgileri</span>
-          </div>
-          <p style="font-size:11px;color:#475569;margin-bottom:8px;line-height:1.5">Meta Developer Console üzerinden token ve phone number ID bilgilerini girin.</p>
-          <input id="wa-token" placeholder="Access Token (EAA...)" style="width:100%;padding:7px 10px;border:1px solid #d1fae5;border-radius:7px;font-size:11px;outline:none;margin-bottom:6px;font-family:inherit" onfocus="this.style.borderColor='#22c55e'" onblur="this.style.borderColor='#d1fae5'">
-          <input id="wa-phone-id" placeholder="Phone Number ID" style="width:100%;padding:7px 10px;border:1px solid #d1fae5;border-radius:7px;font-size:11px;outline:none;font-family:inherit" onfocus="this.style.borderColor='#22c55e'" onblur="this.style.borderColor='#d1fae5'">
-        </div>
-        <!-- Adım 3 -->
-        <div style="background:#fff;border-radius:10px;padding:14px;border:1px solid #bbf7d0">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-            <div style="width:24px;height:24px;background:#22c55e;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:800;flex-shrink:0">3</div>
-            <span style="font-size:12px;font-weight:700;color:#14532d">Webhook Kurulum</span>
-          </div>
-          <p style="font-size:11px;color:#475569;margin-bottom:8px;line-height:1.5">Webhook URL ve verify token bilgilerini Meta Developer Console'a ekleyin.</p>
-          <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:7px;padding:7px 10px;font-size:10px;font-family:monospace;color:#15803d;margin-bottom:6px;word-break:break-all">https://app.dentflow.ai/api/webhook/whatsapp</div>
-          <input id="wa-verify-token" placeholder="Verify Token (kendiniz belirleyin)" style="width:100%;padding:7px 10px;border:1px solid #d1fae5;border-radius:7px;font-size:11px;outline:none;font-family:inherit" onfocus="this.style.borderColor='#22c55e'" onblur="this.style.borderColor='#d1fae5'">
-        </div>
-      </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;flex-wrap:wrap;gap:8px">
-        <a href="https://developers.facebook.com/docs/whatsapp" target="_blank" style="font-size:12px;color:#16a34a;font-weight:600;text-decoration:none;display:flex;align-items:center;gap:4px">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
-          Kurulum Rehberini Aç
-        </a>
-        <div style="display:flex;gap:8px">
-          <button onclick="testWAConnection()" style="padding:8px 16px;border:1px solid #22c55e;background:#fff;color:#15803d;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">Bağlantıyı Test Et</button>
-          <button onclick="saveWAConnection()" style="padding:8px 18px;background:#15803d;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13" style="margin-right:4px"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
-            Kaydet ve Bağla
-          </button>
-        </div>
-      </div>
-    </div>
-
     <!-- Stats -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
-      <div class="kpi-card">
-        <div class="kpi-top"><div class="kpi-icon" style="background:#dcfce7"><svg viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2" width="20" height="20"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg></div><span class="kpi-change up">▲ 18%</span></div>
-        <div class="kpi-value">156</div><div class="kpi-label">Bugün Toplam</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
+      <div class="kpi-card" style="padding:14px">
+        <div class="kpi-top"><div class="kpi-icon" style="background:#dcfce7;width:34px;height:34px"><svg viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2" width="18" height="18"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg></div><span class="kpi-change up">+18%</span></div>
+        <div class="kpi-value" style="font-size:22px">156</div><div class="kpi-label">Bugun Mesaj</div>
       </div>
-      <div class="kpi-card">
-        <div class="kpi-top"><div class="kpi-icon" style="background:#eff6ff"><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" width="20" height="20"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93l-1.41 1.41M5.34 18.66l-1.41 1.41M20 12h2M2 12h2"/></svg></div><span class="kpi-change up">▲ 72%</span></div>
-        <div class="kpi-value">112</div><div class="kpi-label">AI Yanıtladı</div>
+      <div class="kpi-card" style="padding:14px">
+        <div class="kpi-top"><div class="kpi-icon" style="background:#eff6ff;width:34px;height:34px"><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" width="18" height="18"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div><span class="kpi-change up">+72%</span></div>
+        <div class="kpi-value" style="font-size:22px">112</div><div class="kpi-label">AI Yanitladi</div>
       </div>
-      <div class="kpi-card">
-        <div class="kpi-top"><div class="kpi-icon" style="background:#fffbeb"><svg viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" width="20" height="20"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div><span class="kpi-change" style="background:#fffbeb;color:#92400e">12 bekliyor</span></div>
-        <div class="kpi-value">12</div><div class="kpi-label">Onay Bekliyor</div>
+      <div class="kpi-card" style="padding:14px">
+        <div class="kpi-top"><div class="kpi-icon" style="background:#fffbeb;width:34px;height:34px"><svg viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" width="18" height="18"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg></div><span style="font-size:10px;font-weight:700;background:#fffbeb;color:#92400e;padding:2px 6px;border-radius:5px">Bekliyor</span></div>
+        <div class="kpi-value" style="font-size:22px">12</div><div class="kpi-label">Onay Bekliyor</div>
       </div>
-      <div class="kpi-card">
-        <div class="kpi-top"><div class="kpi-icon" style="background:#ecfdf5"><svg viewBox="0 0 24 24" fill="none" stroke="#047857" stroke-width="2" width="20" height="20"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div><span class="kpi-change up">▲ 34%</span></div>
-        <div class="kpi-value">%34</div><div class="kpi-label">Dönüşüm Oranı</div>
+      <div class="kpi-card" style="padding:14px">
+        <div class="kpi-top"><div class="kpi-icon" style="background:#ecfdf5;width:34px;height:34px"><svg viewBox="0 0 24 24" fill="none" stroke="#047857" stroke-width="2" width="18" height="18"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/></svg></div><span class="kpi-change up">+34%</span></div>
+        <div class="kpi-value" style="font-size:22px">%34</div><div class="kpi-label">Donusum</div>
       </div>
     </div>
 
-    <div style="display:grid;grid-template-columns:300px 1fr;gap:16px;height:520px">
-      <!-- Conversation list -->
-      <div class="card" style="display:flex;flex-direction:column;padding:0;overflow:hidden">
-        <div style="padding:14px 16px;border-bottom:1px solid var(--border)">
-          <div style="font-size:13px;font-weight:700;margin-bottom:10px">Konuşmalar</div>
-          <input placeholder="Hasta ara..." style="width:100%;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);font-size:12px;outline:none;font-family:inherit" onfocus="this.style.borderColor='#2563eb'" onblur="this.style.borderColor='#e2e8f0'">
+    <!-- Chat Grid -->
+    <div style="display:grid;grid-template-columns:300px 1fr;gap:16px;height:560px">
+      
+      <!-- Konusma Listesi -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);display:flex;flex-direction:column;overflow:hidden;box-shadow:var(--shadow)">
+        <div style="padding:12px 14px;border-bottom:1px solid var(--border)">
+          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:8px">Konusmalar</div>
+          <div style="position:relative">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12" style="position:absolute;left:9px;top:50%;transform:translateY(-50%);color:var(--text3)"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input placeholder="Hasta ara..." style="width:100%;padding:7px 9px 7px 26px;border:1px solid var(--border);border-radius:7px;font-size:11px;outline:none;font-family:inherit;background:#f8fafc" onfocus="this.style.borderColor='#22c55e'" onblur="this.style.borderColor='var(--border)'">
+          </div>
+        </div>
+        <div style="display:flex;border-bottom:1px solid var(--border);background:#f8fafc">
+          <button id="wa-filter-all" onclick="filterWAConv('all',this)" style="flex:1;padding:7px;font-size:10px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid #22c55e;color:#15803d">Tumu</button>
+          <button id="wa-filter-pending" onclick="filterWAConv('pending',this)" style="flex:1;padding:7px;font-size:10px;font-weight:600;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;color:var(--text3)">Bekliyor</button>
+          <button id="wa-filter-ai" onclick="filterWAConv('ai',this)" style="flex:1;padding:7px;font-size:10px;font-weight:600;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;color:var(--text3)">AI Onerisi</button>
         </div>
         <div style="flex:1;overflow-y:auto" id="wa-conv-list"></div>
       </div>
 
-      <!-- Chat window -->
-      <div class="card" style="display:flex;flex-direction:column;padding:0;overflow:hidden" id="wa-chat-panel">
-        <!-- Chat header -->
-        <div style="padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between" id="wa-chat-header">
+      <!-- Chat Paneli -->
+      <div style="background:#f0f2f5;border:1px solid var(--border);border-radius:var(--radius);display:flex;flex-direction:column;overflow:hidden;box-shadow:var(--shadow)" id="wa-chat-panel">
+        
+        <!-- Chat Header -->
+        <div style="padding:12px 16px;background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between" id="wa-chat-header">
           <div style="display:flex;align-items:center;gap:10px">
-            <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center" id="wa-header-av">AK</div>
+            <div style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0" id="wa-header-av">AK</div>
             <div>
-              <div style="font-size:14px;font-weight:700" id="wa-header-name">Ayşe Kaya</div>
-              <div style="font-size:11px;color:var(--text3)"><span style="color:#22c55e">●</span> Çevrimiçi · +90 532 111 2233</div>
+              <div style="font-size:14px;font-weight:700;color:var(--text)" id="wa-header-name">Ayse Kaya</div>
+              <div style="font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px">
+                <span style="color:#22c55e;font-size:8px">●</span>
+                <span id="wa-header-status">Cevrimici · +90 532 111 2233</span>
+              </div>
             </div>
           </div>
-          <div style="display:flex;gap:8px">
-            <button class="icon-btn" onclick="showToast('Hasta profili açılıyor...')" title="Profil"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="14" height="14"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></button>
-            <button class="icon-btn" onclick="openNewAppointment()" title="Randevu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" width="14" height="14"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></button>
+          <div style="display:flex;gap:6px">
+            <button class="icon-btn" title="Profil" style="width:32px;height:32px" onclick="showToast('Hasta profili')">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            </button>
+            <button class="icon-btn" title="Randevu" style="width:32px;height:32px" onclick="openNewAppointment()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+            </button>
           </div>
         </div>
-        <!-- Messages -->
-        <div style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px" id="wa-messages"></div>
-        <!-- AI Öneri Onay Kutusu -->
-        <div id="wa-ai-suggest" style="margin:0 16px 8px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;padding:10px 12px;display:none">
-          <div style="font-size:11px;font-weight:700;color:#92400e;margin-bottom:4px;display:flex;align-items:center;gap:5px">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-            AI Yanıt Önerisi — Onaylayın veya düzenleyin
+
+        <!-- Mesajlar -->
+        <div style="flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px" id="wa-messages"></div>
+
+        <!-- AI Oneri -->
+        <div id="wa-ai-suggest" style="display:none;margin:0 12px 8px;background:#fff;border:1px solid #fde68a;border-radius:12px;padding:10px;box-shadow:0 2px 8px rgba(0,0,0,.06)">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+            <div style="font-size:11px;font-weight:700;color:#92400e;display:flex;align-items:center;gap:4px">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              AI Yanit Onerisi
+            </div>
+            <div style="display:flex;gap:5px">
+              <button onclick="rejectAISuggest()" style="padding:3px 8px;border:1px solid #fde68a;border-radius:5px;font-size:10px;font-weight:600;color:#92400e;background:none;cursor:pointer">Reddet</button>
+              <button onclick="regenerateAISuggest()" style="padding:3px 8px;border:1px solid #fde68a;border-radius:5px;font-size:10px;font-weight:600;color:#92400e;background:none;cursor:pointer">↺</button>
+              <button onclick="approveAISuggest()" style="padding:3px 10px;background:#15803d;color:#fff;border:none;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer">✓ Gonder</button>
+            </div>
           </div>
-          <textarea id="wa-suggest-text" rows="3" style="width:100%;border:none;background:transparent;font-size:12px;color:#78350f;resize:none;outline:none;font-family:inherit;line-height:1.5"></textarea>
-          <div style="display:flex;gap:8px;margin-top:6px">
-            <button onclick="rejectAISuggest()" style="padding:5px 12px;border:1px solid #fde68a;border-radius:6px;font-size:11px;font-weight:600;color:#92400e;background:none;cursor:pointer">Reddet</button>
-            <button onclick="regenerateAISuggest()" style="padding:5px 12px;border:1px solid #fde68a;border-radius:6px;font-size:11px;font-weight:600;color:#92400e;background:none;cursor:pointer">↺ Yeniden Üret</button>
-            <button onclick="approveAISuggest()" style="padding:5px 14px;background:#15803d;color:#fff;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;margin-left:auto">✓ Onayla ve Gönder</button>
-          </div>
+          <textarea id="wa-suggest-text" rows="2" style="width:100%;border:none;background:#fffbeb;border-radius:7px;padding:7px;font-size:12px;color:#78350f;resize:none;outline:none;font-family:inherit;line-height:1.5"></textarea>
         </div>
+
         <!-- Input -->
-        <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;align-items:flex-end">
-          <textarea id="wa-input" rows="2" placeholder="Mesaj yaz veya AI önerisi iste..." style="flex:1;border:1px solid var(--border);border-radius:var(--radius-sm);padding:9px 12px;font-size:13px;resize:none;outline:none;font-family:inherit;line-height:1.5" onfocus="this.style.borderColor='#2563eb'" onblur="this.style.borderColor='#e2e8f0'"></textarea>
-          <div style="display:flex;flex-direction:column;gap:6px">
-            <button onclick="requestAISuggest()" title="AI Yanıt Öner" style="width:36px;height:36px;border-radius:8px;background:#fffbeb;border:1px solid #fde68a;color:#d97706;cursor:pointer;display:flex;align-items:center;justify-content:center">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-            </button>
-            <button onclick="sendWAMessage()" style="width:36px;height:36px;border-radius:8px;background:#22c55e;border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-            </button>
-          </div>
+        <div style="padding:10px 12px;background:var(--surface);border-top:1px solid var(--border);display:flex;gap:8px;align-items:flex-end">
+          <button onclick="requestAISuggest()" title="AI Yanit" style="width:36px;height:36px;border-radius:50%;background:#fffbeb;border:1px solid #fde68a;color:#d97706;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          </button>
+          <textarea id="wa-input" rows="1" placeholder="Mesaj yaz..." style="flex:1;border:1px solid var(--border);border-radius:20px;padding:9px 14px;font-size:13px;resize:none;outline:none;font-family:inherit;line-height:1.5;background:#f8fafc" onfocus="this.style.borderColor='#22c55e'" onblur="this.style.borderColor='var(--border)'"></textarea>
+          <button onclick="sendWAMessage()" style="width:38px;height:38px;border-radius:50%;background:#22c55e;border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 8px rgba(34,197,94,.3)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="15" height="15"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+          </button>
         </div>
       </div>
     </div>
   </div>
-
   <!-- ════════════════════════════════
        INSTAGRAM PANELİ
   ════════════════════════════════ -->
@@ -2439,6 +2395,16 @@ const WA_CONVS = [
 ];
 
 let activeConvId = 1;
+
+
+function filterWAConv(filter, btn) {
+  ['all','pending','ai'].forEach(f => {
+    const b = document.getElementById('wa-filter-' + f);
+    if (b) { b.style.borderBottomColor = 'transparent'; b.style.color = 'var(--text3)'; b.style.fontWeight = '600'; }
+  });
+  if (btn) { btn.style.borderBottomColor = '#22c55e'; btn.style.color = '#15803d'; btn.style.fontWeight = '700'; }
+  buildWAConvList();
+}
 
 function buildWAConvList() {
   const list = document.getElementById('wa-conv-list');
