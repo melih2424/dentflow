@@ -3913,5 +3913,109 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+
+<!-- HASTA DETAY MODAL -->
+<div id="modal-patient-detail" style="display:none;position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:600;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
+  <div style="background:#fff;border-radius:16px;width:640px;max-width:96vw;max-height:92vh;box-shadow:0 24px 64px rgba(0,0,0,.2);overflow:hidden;display:flex;flex-direction:column">
+    <div style="padding:18px 24px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:14px;flex-shrink:0">
+      <div id="pd-avatar" style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0">AK</div>
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div id="pd-name" style="font-size:17px;font-weight:800;color:#0f172a">Hasta Adi</div>
+        </div>
+        <div id="pd-phone" style="font-size:12px;color:#94a3b8;margin-top:2px">—</div>
+      </div>
+      <button onclick="closePatientDetail()" style="width:32px;height:32px;border-radius:8px;border:1px solid #e2e8f0;background:none;font-size:18px;color:#64748b;cursor:pointer">✕</button>
+    </div>
+    <div style="display:flex;border-bottom:1px solid #e2e8f0;flex-shrink:0;padding:0 24px">
+      <button onclick="switchPdTab('info')" id="pd-tab-info" style="padding:10px 16px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid #2563eb;color:#2563eb">Hasta Bilgisi</button>
+      <button onclick="switchPdTab('history')" id="pd-tab-history" style="padding:10px 16px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;color:#94a3b8">Islem Gecmisi</button>
+      <button onclick="switchPdTab('edit')" id="pd-tab-edit" style="padding:10px 16px;font-size:12px;font-weight:700;border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;color:#94a3b8">Bilgileri Guncelle</button>
+    </div>
+    <div id="pd-panel-info" style="padding:20px 24px;overflow-y:auto;flex:1">
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+        <div style="background:#f8fafc;border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:4px">Durum</div>
+          <div id="pd-status" style="font-size:12px;font-weight:700;padding:4px 10px;border-radius:5px;display:inline-block">Yeni Lead</div>
+        </div>
+        <div style="background:#f8fafc;border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:4px">Kaynak</div>
+          <div id="pd-source" style="font-size:12px;font-weight:700;padding:4px 10px;border-radius:5px;display:inline-block">WhatsApp</div>
+        </div>
+        <div style="background:#f8fafc;border-radius:10px;padding:12px;text-align:center">
+          <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:4px">Kayit Tarihi</div>
+          <div id="pd-date" style="font-size:12px;font-weight:700;color:#0f172a">—</div>
+        </div>
+      </div>
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:6px">Ilgilendigi Hizmet</div>
+        <div id="pd-service" style="font-size:14px;font-weight:600;color:#0f172a;background:#f8fafc;padding:10px 14px;border-radius:8px">—</div>
+      </div>
+      <div style="margin-bottom:14px">
+        <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:6px">Notlar</div>
+        <div id="pd-notes" style="font-size:13px;color:#475569;background:#f8fafc;padding:10px 14px;border-radius:8px;min-height:50px;line-height:1.6">—</div>
+      </div>
+      <div>
+        <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:8px">Durumu Guncelle</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <button onclick="updatePatientStatus('new_lead')" style="padding:5px 10px;border-radius:6px;border:1px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;font-size:11px;font-weight:700;cursor:pointer">Yeni Lead</button>
+          <button onclick="updatePatientStatus('price_given')" style="padding:5px 10px;border-radius:6px;border:1px solid #ddd6fe;background:#f5f3ff;color:#6d28d9;font-size:11px;font-weight:700;cursor:pointer">Fiyat Aldi</button>
+          <button onclick="updatePatientStatus('appointment_pending')" style="padding:5px 10px;border-radius:6px;border:1px solid #fde68a;background:#fffbeb;color:#92400e;font-size:11px;font-weight:700;cursor:pointer">Randevu Bekliyor</button>
+          <button onclick="updatePatientStatus('appointment_booked')" style="padding:5px 10px;border-radius:6px;border:1px solid #c7d2fe;background:#eef2ff;color:#4338ca;font-size:11px;font-weight:700;cursor:pointer">Randevu Aldi</button>
+          <button onclick="updatePatientStatus('treatment_started')" style="padding:5px 10px;border-radius:6px;border:1px solid #bbf7d0;background:#ecfdf5;color:#047857;font-size:11px;font-weight:700;cursor:pointer">Tedavi Basladi</button>
+          <button onclick="updatePatientStatus('review_done')" style="padding:5px 10px;border-radius:6px;border:1px solid #f9a8d4;background:#fdf2f8;color:#be185d;font-size:11px;font-weight:700;cursor:pointer">Yorum Yapti</button>
+        </div>
+      </div>
+    </div>
+    <div id="pd-panel-history" style="display:none;padding:20px 24px;overflow-y:auto;flex:1">
+      <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:12px">Son Islemler</div>
+      <div id="pd-history-list"></div>
+      <div style="margin-top:20px">
+        <div style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;margin-bottom:10px">Yeni Islem Ekle</div>
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <select id="pd-treatment-type" style="flex:1;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:12px;outline:none;background:#fff">
+            <option value="">Tedavi secin...</option>
+            <option>Implant</option><option>Porselen Kron</option><option>Zirkonyum</option>
+            <option>Dis Beyazlatma</option><option>Kanal Tedavisi</option><option>Ortodonti</option>
+            <option>Gomulu Dis</option><option>Dis Kaplama</option><option>Genel Kontrol</option>
+          </select>
+          <input id="pd-treatment-note" placeholder="Not (opsiyonel)" style="flex:2;padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:12px;outline:none;font-family:inherit">
+        </div>
+        <button onclick="addTreatmentRecord()" style="width:100%;padding:9px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">+ Islem Kaydet</button>
+      </div>
+    </div>
+    <div id="pd-panel-edit" style="display:none;padding:20px 24px;overflow-y:auto;flex:1">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+        <div>
+          <label style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;display:block;margin-bottom:5px">Ad Soyad</label>
+          <input id="pd-edit-name" style="width:100%;padding:9px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;font-family:inherit">
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;display:block;margin-bottom:5px">Telefon</label>
+          <input id="pd-edit-phone" style="width:100%;padding:9px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;font-family:inherit">
+        </div>
+      </div>
+      <div style="margin-bottom:12px">
+        <label style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;display:block;margin-bottom:5px">Ilgilendigi Hizmet</label>
+        <select id="pd-edit-service" style="width:100%;padding:9px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;background:#fff">
+          <option value="">Secin...</option>
+          <option>Implant</option><option>Porselen Kron</option><option>Zirkonyum</option>
+          <option>Dis Beyazlatma</option><option>Kanal Tedavisi</option><option>Ortodonti</option>
+        </select>
+      </div>
+      <div style="margin-bottom:16px">
+        <label style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;display:block;margin-bottom:5px">Notlar</label>
+        <textarea id="pd-edit-notes" rows="3" style="width:100%;padding:9px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;resize:none;font-family:inherit;line-height:1.5"></textarea>
+      </div>
+      <button onclick="savePatientEdit()" style="width:100%;padding:10px;background:#2563eb;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer">Degisiklikleri Kaydet</button>
+    </div>
+    <div style="padding:12px 24px;border-top:1px solid #e2e8f0;display:flex;gap:10px;flex-shrink:0">
+      <button onclick="openWhatsApp(currentPatient?.p)" style="flex:1;padding:9px;background:#22c55e;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">WhatsApp</button>
+      <button onclick="openNewAppointmentForPatient(currentPatient?.n,currentPatient?.p);closePatientDetail()" style="flex:1;padding:9px;background:#6366f1;color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">Randevu Olustur</button>
+      <button onclick="closePatientDetail()" style="padding:9px 14px;border:1px solid #e2e8f0;border-radius:8px;font-size:12px;font-weight:600;color:#64748b;background:none;cursor:pointer">Kapat</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
