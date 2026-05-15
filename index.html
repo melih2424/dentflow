@@ -2040,6 +2040,21 @@ function buildCharts(){
 
 // ── INIT ── (auth sonrası çağrılır)
 function initDashboard() {
+  // Auth kontrolü - login yoksa login ekranına yönlendir
+  if (_supabase) {
+    _supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        document.getElementById('login-screen').style.display = 'flex';
+        document.getElementById('app').style.display = 'none';
+        return;
+      }
+      _loadDashboard();
+    });
+    return;
+  }
+  _loadDashboard();
+}
+function _loadDashboard() {
   buildKanban();buildPatients();buildAppointments();buildCal();buildReviews();buildAutomations();buildCharts();
   const aiPrompt = document.getElementById('ai-prompt');
   if(aiPrompt) { aiPrompt.addEventListener('input',updatePromptChars); updatePromptChars(); }
