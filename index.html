@@ -560,7 +560,7 @@ input[type=range]{width:100%;accent-color:var(--blue);cursor:pointer}
   <span id="toast-msg">İşlem başarılı!</span>
 </div>
 
-<div class="app" id="app" style="display:none">
+<div class="app" id="app">
 
 <!-- ── SIDEBAR ── -->
 <div class="sidebar" id="sidebar">
@@ -1702,7 +1702,7 @@ KLİNİK BİLGİLERİ:
 </div><!-- /main -->
 </div><!-- /app -->
 <!-- ── LOGIN EKRANI ── -->
-<div id="login-screen" style="display:flex;position:fixed;inset:0;background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%);z-index:9999;align-items:center;justify-content:center;">
+<div id="login-screen" style="display:none;position:fixed;inset:0;background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 100%);z-index:9999;align-items:center;justify-content:center;">
   <div style="background:#fff;border-radius:20px;width:400px;max-width:92vw;padding:40px 36px;box-shadow:0 32px 80px rgba(0,0,0,.35)">
     <div style="text-align:center;margin-bottom:28px">
       <div style="width:56px;height:56px;background:linear-gradient(135deg,#2563eb,#6366f1);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px">
@@ -1753,7 +1753,7 @@ KLİNİK BİLGİLERİ:
 
 <script>
 const SUPABASE_URL = 'https://kpdsgcjcezzaptkoqklu.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwZHNnY2pjZXp6YXB0a29xa2x1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3ODc3MzUyOCwiZXhwIjoyMDk0MzQ5NTI4fQ.3IIDBd_Yz_Fk-gah-xi9sKLQQRJOG33126nFsZbgLEI';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtwZHNnY2pjZXp6YXB0a29xa2x1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg3NzM1MjgsImV4cCI6MjA5NDM0OTUyOH0.O3u29s1ZAC8KBhMDahsixPg3pMEGpy-vL8a-DQUyilo';
 let _supabase;
 try {
   _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -1784,11 +1784,7 @@ async function doLogin() {
     errEl.style.display = 'block';
     errEl.textContent = 'E-posta veya sifre hatali.';
     btn.textContent = 'Giris Yap'; btn.disabled = false;
-    } else {
-      document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('app').style.display = 'flex';
-      initDashboard();
-    }
+  }
 }
 
 async function doRegister() {
@@ -1815,25 +1811,10 @@ async function doLogout() {
 }
 
 async function loadSupabaseData() {
-  if (!_supabase) return;
-  try {
-    const { data: patients } = await _supabase.from('patients').select('*').order('created_at', {ascending: false});
-    if (patients && patients.length > 0) {
-      const statusMap = {new_lead:{l:'Yeni Lead',c:'#eff6ff;color:#1d4ed8'},price_given:{l:'Fiyat Aldi',c:'#f5f3ff;color:#6d28d9'},appointment_pending:{l:'Randevu Bekliyor',c:'#fffbeb;color:#92400e'},appointment_booked:{l:'Randevu Aldi',c:'#eef2ff;color:#4338ca'},treatment_started:{l:'Tedavi Basladi',c:'#ecfdf5;color:#047857'},review_done:{l:'Yorum Yapti',c:'#f0fdf4;color:#15803d'}};
-      const srcColorMap = {whatsapp:'#dcfce7;color:#15803d',instagram:'#fce7f3;color:#be185d',facebook:'#dbeafe;color:#1d4ed8',google_ads:'#fee2e2;color:#b91c1c',organic:'#f1f5f9;color:#475569'};
-      const srcLabel = {whatsapp:'WhatsApp',instagram:'Instagram',facebook:'Facebook',google_ads:'Google',organic:'Organik'};
-      const months = ['Oca','Sub','Mar','Nis','May','Haz','Tem','Agu','Eyl','Eki','Kas','Ara'];
-      PATIENTS.length = 0;
-      patients.forEach(p => {
-        const d = new Date(p.created_at);
-        const st = statusMap[p.status] || {l:'Yeni Lead',c:'#eff6ff;color:#1d4ed8'};
-        PATIENTS.push({id:p.id, n:p.name||'', p:p.phone||'', status:p.status||'new_lead', statusLabel:st.l, statusColor:st.c, src:srcLabel[p.source]||'WhatsApp', srcColor:srcColorMap[p.source]||'#dcfce7;color:#15803d', s:p.interested_service||'—', d:d.getDate()+' '+months[d.getMonth()]});
-      });
-      buildPatients();
-      buildKanban();
-    }
-  } catch(e) { console.error('loadSupabaseData error:', e); }
-  return;
+  const { data: patients } = await _supabase.from('patients').select('*').order('created_at', { ascending: false });
+  if (patients) window.DB_PATIENTS = patients;
+  const { data: appointments } = await _supabase.from('appointments').select('*').order('date', { ascending: true });
+  if (appointments) window.DB_APPOINTMENTS = appointments;
 }
 
 async function savePatientToSupabase(patient) {
@@ -1884,19 +1865,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   } else {
     // Supabase yoksa direkt dashboard aç
-    // Auth kontrolü ile başlat
-  if (typeof _supabase !== 'undefined' && _supabase) {
-    _supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        initDashboard();
-      } else {
-        document.getElementById('login-screen').style.display = 'flex';
-        document.getElementById('app').style.display = 'none';
-      }
-    });
-  } else {
     initDashboard();
-  }
   }
 });
 </script>
@@ -2071,21 +2040,6 @@ function buildCharts(){
 
 // ── INIT ── (auth sonrası çağrılır)
 function initDashboard() {
-  // Auth kontrolü - login yoksa login ekranına yönlendir
-  if (_supabase) {
-    _supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        document.getElementById('login-screen').style.display = 'flex';
-        document.getElementById('app').style.display = 'none';
-        return;
-      }
-      _loadDashboard();
-    });
-    return;
-  }
-  _loadDashboard();
-}
-function _loadDashboard() {
   buildKanban();buildPatients();buildAppointments();buildCal();buildReviews();buildAutomations();buildCharts();
   const aiPrompt = document.getElementById('ai-prompt');
   if(aiPrompt) { aiPrompt.addEventListener('input',updatePromptChars); updatePromptChars(); }
@@ -2785,38 +2739,6 @@ function closeNewPatient(){
   document.getElementById('modal-patient').style.display='none';
   document.getElementById('form-patient').reset();
 }
-
-async function randevuOlustur() {
-  const patient = document.getElementById('na-patient').value;
-  const date    = document.getElementById('na-date').value;
-  const time    = document.getElementById('na-time').value;
-  const service = document.getElementById('na-service-appt').value;
-  const doctor  = document.getElementById('na-doctor').value;
-  if(!patient){showToast('Lutfen hasta secin','error');return;}
-  const d = new Date(date);
-  const months = ['Oca','Sub','Mar','Nis','May','Haz','Tem','Agu','Eyl','Eki','Kas','Ara'];
-  APPOINTMENTS.unshift({time,date:d.getDate()+' '+months[d.getMonth()],patient,service,doctor,status:'pending',statusLabel:'Bekliyor',tc:'#92400e',tbg:'#fffbeb',bc:'#7c3aed',bbg:'#f5f3ff'});
-  buildAppointments();
-  if (_supabase) {
-    const patientRecord = PATIENTS.find(p => p.n === patient);
-    const { error } = await _supabase.from('appointments').insert([{
-      patient_id: patientRecord?.id || null,
-      patient_name: patient,
-      date: date,
-      time: time,
-      service_type: service,
-      doctor_name: doctor,
-      status: 'pending'
-    }]);
-    if(error){ showToast('Randevu hatasi: '+error.message,'error'); }
-    else { showToast(patient+' icin randevu kaydedildi!','success'); }
-  } else {
-    showToast(patient+' icin randevu olusturuldu!','success');
-  }
-  closeNewAppointment();
-  showPage('appointments', document.querySelectorAll('.nav-item')[3]);
-}
-
 async function hastaEkle() {
   const btn = document.getElementById('btn-hasta-ekle');
   const name    = document.getElementById('np-name').value.trim();
@@ -3032,7 +2954,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeNewPat
       </div>
       <button onclick="closeNewAppointment()" style="width:32px;height:32px;border-radius:8px;border:1px solid #e2e8f0;background:none;font-size:18px;color:#64748b;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
     </div>
-    <form id="form-appointment" style="padding:20px 24px" onsubmit="return false">
+    <form id="form-appointment" style="padding:20px 24px">
       <div style="margin-bottom:14px">
         <label style="font-size:12px;font-weight:600;color:#475569;display:block;margin-bottom:5px">Hasta <span style="color:#ef4444">*</span></label>
         <select id="na-patient" required style="width:100%;padding:9px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;font-family:inherit;background:#fff;cursor:pointer">
@@ -3077,7 +2999,7 @@ document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeNewPat
       </div>
       <div style="display:flex;gap:10px">
         <button type="button" onclick="closeNewAppointment()" style="flex:1;padding:10px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;font-weight:600;color:#64748b;background:none;cursor:pointer">İptal</button>
-        <button type="button" onclick="randevuOlustur()" style="flex:2;padding:10px;background:#6366f1;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
+        <button type="submit" style="flex:2;padding:10px;background:#6366f1;color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>
           Randevu Oluştur
         </button>
