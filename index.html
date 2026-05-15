@@ -3892,7 +3892,7 @@ function checkCustomService(sel) {
   }
 }
 
-function savePatientEdit() {
+async function savePatientEdit() {
   const name = document.getElementById('pd-edit-name').value.trim();
   const phone = document.getElementById('pd-edit-phone').value.trim();
   const serviceSelect = document.getElementById('pd-edit-service').value;
