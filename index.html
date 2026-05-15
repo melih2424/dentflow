@@ -733,64 +733,62 @@ input[type=range]{width:100%;accent-color:var(--blue);cursor:pointer}
       </div>
     </div>
 
-    <div class="charts-row">
-      <div class="card">
-        <div class="card-title">Lead & Randevu Trendi</div>
-        <div class="card-sub">Son 30 gün</div>
-        <div class="chart-wrap"><canvas id="leadChart"></canvas></div>
+    <div class="charts-row" style="grid-template-columns:2fr 1fr">
+      <div class="card" style="padding:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div><div class="card-title" style="font-size:13px">Lead & Randevu Trendi</div><div class="card-sub" style="font-size:11px">Son 30 gun</div></div>
+        </div>
+        <div style="height:150px;position:relative"><canvas id="leadChart"></canvas></div>
       </div>
-      <div class="card">
-        <div class="card-title">Yorum Artışı</div>
-        <div class="card-sub">Bu hafta</div>
-        <div class="chart-wrap"><canvas id="reviewChart"></canvas></div>
+      <div class="card" style="padding:16px">
+        <div class="card-title" style="font-size:13px;margin-bottom:4px">Yorum Artisi</div>
+        <div class="card-sub" style="font-size:11px;margin-bottom:8px">Bu hafta</div>
+        <div style="height:150px;position:relative"><canvas id="reviewChart"></canvas></div>
       </div>
     </div>
 
-    <div class="bottom-grid">
-      <div class="card">
-        <div class="card-title">Canlı Aktivite</div>
-        <div class="card-sub">Anlık işlemler</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">
+      <div class="card" style="padding:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div><div class="card-title" style="font-size:13px">Bugunun Randevulari</div><div class="card-sub" id="today-appt-sub" style="font-size:11px">Yukleniyor...</div></div>
+          <button onclick="showPage('appointments',document.querySelectorAll('.nav-item')[3])" style="font-size:11px;font-weight:600;color:#2563eb;background:none;border:none;cursor:pointer">Tumu →</button>
+        </div>
+        <div id="today-appt-list" style="max-height:180px;overflow-y:auto"><div style="text-align:center;padding:16px;color:var(--text3);font-size:12px">Yukleniyor...</div></div>
+      </div>
+      <div class="card" style="padding:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div><div class="card-title" style="font-size:13px">⭐ Yorum Bekleyen Hastalar</div><div class="card-sub" style="font-size:11px">Tedavisi tamamlananlar</div></div>
+          <span id="review-pending-count" style="font-size:11px;font-weight:700;background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:10px">0</span>
+        </div>
+        <div id="review-pending-list" style="max-height:180px;overflow-y:auto"><div style="text-align:center;padding:16px;color:var(--text3);font-size:12px">Yukleniyor...</div></div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px">
+      <div class="card" style="padding:16px">
+        <div class="card-title" style="font-size:13px;margin-bottom:4px">Canli Aktivite</div>
+        <div class="card-sub" style="font-size:11px;margin-bottom:10px">Anlik islemler</div>
         <div id="live-feed">
-          <div class="feed-item"><div class="feed-av" style="background:#dbeafe;color:#1d4ed8">AK</div><div><div class="feed-name">Ayşe Kaya</div><div class="feed-action">Yeni WhatsApp mesajı gönderdi</div></div><span class="feed-time">2dk</span></div>
-          <div class="feed-item"><div class="feed-av" style="background:#ede9fe;color:#6d28d9">MD</div><div><div class="feed-name">Mehmet Demir</div><div class="feed-action">Randevu aldı — Porselen Kron</div></div><span class="feed-time">8dk</span></div>
-          <div class="feed-item"><div class="feed-av" style="background:#dcfce7;color:#15803d">FŞ</div><div><div class="feed-name">Fatma Şahin</div><div class="feed-action">Google yorumu bıraktı ★★★★★</div></div><span class="feed-time">15dk</span></div>
-          <div class="feed-item"><div class="feed-av" style="background:#fef3c7;color:#92400e">AÇ</div><div><div class="feed-name">Ali Çelik</div><div class="feed-action">İmplant fiyatı sordu</div></div><span class="feed-time">32dk</span></div>
-          <div class="feed-item"><div class="feed-av" style="background:#fee2e2;color:#b91c1c">ZA</div><div><div class="feed-name">Zeynep Arslan</div><div class="feed-action">Randevusunu iptal etti</div></div><span class="feed-time">1sa</span></div>
+          <div class="feed-item"><div class="feed-av" style="background:#dbeafe;color:#1d4ed8;width:30px;height:30px;font-size:10px">AK</div><div><div class="feed-name" style="font-size:12px">Ayse Kaya</div><div class="feed-action" style="font-size:11px">Yeni WhatsApp mesaji gonderdi</div></div><span class="feed-time" style="font-size:10px">2dk</span></div>
+          <div class="feed-item"><div class="feed-av" style="background:#ede9fe;color:#6d28d9;width:30px;height:30px;font-size:10px">MD</div><div><div class="feed-name" style="font-size:12px">Mehmet Demir</div><div class="feed-action" style="font-size:11px">Randevu aldi - Porselen Kron</div></div><span class="feed-time" style="font-size:10px">8dk</span></div>
+          <div class="feed-item"><div class="feed-av" style="background:#dcfce7;color:#15803d;width:30px;height:30px;font-size:10px">FS</div><div><div class="feed-name" style="font-size:12px">Fatma Sahin</div><div class="feed-action" style="font-size:11px">Google yorumu birakti 5/5</div></div><span class="feed-time" style="font-size:10px">15dk</span></div>
         </div>
       </div>
-      <div class="card">
-        <div class="card-title">Hızlı İşlemler</div>
-        <div class="card-sub">Sık kullanılanlar</div>
-        <div class="quick-grid">
-          <button class="quick-btn" onclick="openNewPatient()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
-            Yeni Hasta
-          </button>
-          <button class="quick-btn" onclick="openNewAppointment()">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><line x1="12" y1="14" x2="12" y2="20"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
-            Randevu Ekle
-          </button>
-          <button class="quick-btn" onclick="showPage('crm',document.querySelectorAll('.nav-item')[1]);showToast('CRM açılıyor...')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
-            Mesaj Gönder
-          </button>
-          <button class="quick-btn" onclick="showPage('reviews',document.querySelectorAll('.nav-item')[4]);showToast('Yorum isteği gönderildi!','success')">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-            Yorum İste
-          </button>
+      <div class="card" style="padding:16px">
+        <div class="card-title" style="font-size:13px;margin-bottom:4px">Hizli Islemler</div>
+        <div class="card-sub" style="font-size:11px;margin-bottom:10px">Sik kullanilanlar</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+          <button class="quick-btn" style="font-size:11px;padding:10px 8px" onclick="openNewPatient()"><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" width="14" height="14"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>Yeni Hasta</button>
+          <button class="quick-btn" style="font-size:11px;padding:10px 8px" onclick="openNewAppointment()"><svg viewBox="0 0 24 24" fill="none" stroke="#7c3aed" stroke-width="2" width="14" height="14"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Randevu Ekle</button>
+          <button class="quick-btn" style="font-size:11px;padding:10px 8px" onclick="showPage('reviews',document.querySelectorAll('.nav-item')[4])"><svg viewBox="0 0 24 24" fill="none" stroke="#d97706" stroke-width="2" width="14" height="14"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Yorum Iste</button>
+          <button class="quick-btn" style="font-size:11px;padding:10px 8px" onclick="showPage('patients',document.querySelectorAll('.nav-item')[2])"><svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2" width="14" height="14"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Tum Hastalar</button>
         </div>
-        <div class="ai-box">
-          <div class="ai-box-title">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-            AI Asistanı Bugün
-          </div>
-          <div class="ai-box-text">47 mesajı otomatik yanıtladı · Dönüşüm oranı: <strong>%72</strong> · 3 randevu kapattı</div>
-        </div>
+        <div class="ai-box" style="padding:10px"><div class="ai-box-title" style="font-size:11px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="12" height="12"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>AI Asistani Bugun</div><div style="font-size:11px;color:#1d4ed8;margin-top:4px">47 mesaji otomatik yanitladi · <strong>%72</strong> donusum</div></div>
       </div>
     </div>
   </div>
 
-  <!-- ════════════════════════════════
+<!-- ════════════════════════════════
        CRM PAGE
   ════════════════════════════════ -->
   <div class="crm-page" id="page-crm">
@@ -2379,6 +2377,7 @@ function buildCharts(){
 // ── INIT ── (auth sonrası çağrılır)
 function initDashboard() {
   buildKanban();buildPatients();buildAppointments();buildCal();buildReviews();buildAutomations();buildCharts();
+  setTimeout(()=>{buildDashboardToday();buildReviewPending();},600);
   const aiPrompt = document.getElementById('ai-prompt');
   if(aiPrompt) { aiPrompt.addEventListener('input',updatePromptChars); updatePromptChars(); }
 }
@@ -3693,5 +3692,44 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+
+<script>
+function buildDashboardToday() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const todayAppts = APPOINTMENTS.filter(a => {
+    try {
+      const d = a.dateObj ? new Date(a.dateObj) : (a.date ? new Date(a.date) : null);
+      if (!d || isNaN(d)) return false;
+      d.setHours(0,0,0,0);
+      return d.getTime() === today.getTime();
+    } catch(e) { return false; }
+  }).sort((a,b)=>(a.time||'').localeCompare(b.time||''));
+  const sub = document.getElementById('today-appt-sub');
+  const list = document.getElementById('today-appt-list');
+  if (!list) return;
+  const months = ['Oca','Sub','Mar','Nis','May','Haz','Tem','Agu','Eyl','Eki','Kas','Ara'];
+  if (sub) sub.textContent = today.getDate()+' '+months[today.getMonth()]+' - '+todayAppts.length+' randevu';
+  if (todayAppts.length === 0) { list.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text3);font-size:12px">Bugun randevu yok</div>'; return; }
+  const sc = {pending:'#f59e0b',confirmed:'#10b981',completed:'#10b981',cancelled:'#ef4444'};
+  list.innerHTML = todayAppts.map(a=>`<div style="display:flex;align-items:center;gap:8px;padding:7px;border-radius:8px;margin-bottom:4px;border:1px solid var(--border)"><div style="width:3px;height:32px;border-radius:2px;background:${sc[a.status]||'#f59e0b'};flex-shrink:0"></div><div style="width:38px;text-align:center;flex-shrink:0"><div style="font-size:12px;font-weight:800;color:var(--text)">${a.time||'--'}</div></div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.patient}</div><div style="font-size:11px;color:var(--text3)">${a.service||'—'}</div></div></div>`).join('');
+}
+function buildReviewPending() {
+  const list = document.getElementById('review-pending-list');
+  const countEl = document.getElementById('review-pending-count');
+  if (!list) return;
+  const pending = PATIENTS.filter(p => p.status === 'treatment_started' || p.status === 'appointment_booked');
+  if (countEl) countEl.textContent = pending.length;
+  if (pending.length === 0) { list.innerHTML = '<div style="text-align:center;padding:16px;color:var(--text3);font-size:12px">Bekleyen hasta yok</div>'; return; }
+  list.innerHTML = pending.map(p=>`<div style="display:flex;align-items:center;gap:8px;padding:7px;border-radius:8px;margin-bottom:4px;border:1px solid var(--border)"><div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#6366f1);color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${p.n.split(' ').map(w=>w[0]).slice(0,2).join('')}</div><div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.n}</div><div style="font-size:11px;color:var(--text3)">${p.s||'—'}</div></div><button onclick="sendReviewWA('${p.n}','${p.p}')" style="padding:4px 8px;background:#22c55e;color:#fff;border:none;border-radius:5px;font-size:10px;font-weight:700;cursor:pointer;flex-shrink:0">WA</button></div>`).join('');
+}
+function sendReviewWA(name, phone) {
+  const link = 'https://g.page/r/guler-dis/review';
+  const msg = 'Merhaba ' + name.split(' ')[0] + '! Tedavinizin nasil gectigini merak ediyoruz. Google yorumu birakir misiniz? ' + link;
+  const clean = phone.replace(/[^0-9]/g,'');
+  const num = clean.startsWith('90') ? clean : '90' + clean.replace(/^0/,'');
+  window.open('https://wa.me/' + num + '?text=' + encodeURIComponent(msg), '_blank');
+  showToast(name + ' icin yorum istegi gonderildi!', 'success');
+}
+</script>
 </body>
 </html>
