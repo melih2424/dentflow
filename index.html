@@ -3881,10 +3881,23 @@ function fillEditForm() {
   if (svc) for (let i = 0; i < svc.options.length; i++) { if (svc.options[i].value === currentPatient.s) { svc.selectedIndex = i; break; } }
 }
 
-async function savePatientEdit() {
+async 
+function checkCustomService(sel) {
+  const custom = document.getElementById('pd-edit-service-custom');
+  if (sel.value === 'Diger (Manuel Gir)') {
+    custom.style.display = 'block';
+    custom.focus();
+  } else {
+    custom.style.display = 'none';
+  }
+}
+
+function savePatientEdit() {
   const name = document.getElementById('pd-edit-name').value.trim();
   const phone = document.getElementById('pd-edit-phone').value.trim();
-  const service = document.getElementById('pd-edit-service').value;
+  const serviceSelect = document.getElementById('pd-edit-service').value;
+  const serviceCustom = document.getElementById('pd-edit-service-custom').value.trim();
+  const service = serviceSelect === 'Diger (Manuel Gir)' ? serviceCustom : serviceSelect;
   const notes = document.getElementById('pd-edit-notes').value.trim();
   if (!name) { showToast('Ad Soyad bos olamaz', 'error'); return; }
   currentPatient.n = name; currentPatient.p = phone;
@@ -3997,11 +4010,24 @@ document.addEventListener('DOMContentLoaded', function() {
       </div>
       <div style="margin-bottom:12px">
         <label style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;display:block;margin-bottom:5px">Ilgilendigi Hizmet</label>
-        <select id="pd-edit-service" style="width:100%;padding:9px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;background:#fff">
+        <select id="pd-edit-service" onchange="checkCustomService(this)" style="width:100%;padding:9px 12px;border:1px solid #e2e8f0;border-radius:8px;font-size:13px;outline:none;background:#fff;margin-bottom:6px">
           <option value="">Secin...</option>
-          <option>Implant</option><option>Porselen Kron</option><option>Zirkonyum</option>
-          <option>Dis Beyazlatma</option><option>Kanal Tedavisi</option><option>Ortodonti</option>
+          <option>Implant</option>
+          <option>Porselen Kron</option>
+          <option>Zirkonyum</option>
+          <option>Dis Beyazlatma</option>
+          <option>Kanal Tedavisi</option>
+          <option>Ortodonti</option>
+          <option>Gomulu Dis Cekimi</option>
+          <option>Dis Kaplama</option>
+          <option>Genel Kontrol</option>
+          <option>Dolgu</option>
+          <option>Protez</option>
+          <option>Sinus Lifting</option>
+          <option>Kemik Grefti</option>
+          <option>Diger (Manuel Gir)</option>
         </select>
+        <input id="pd-edit-service-custom" placeholder="Hizmet adini girin..." style="display:none;width:100%;padding:9px 12px;border:1px solid #2563eb;border-radius:8px;font-size:13px;outline:none;font-family:inherit">
       </div>
       <div style="margin-bottom:16px">
         <label style="font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;display:block;margin-bottom:5px">Notlar</label>
