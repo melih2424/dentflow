@@ -649,7 +649,7 @@ input[type=range]{width:100%;accent-color:var(--blue);cursor:pointer}
 <div class="main">
   <div class="topbar">
     <div class="topbar-breadcrumb">
-      Güler Diş Kliniği
+      <span data-clinic-name="">Güler Diş Kliniği</span>
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
       <strong id="breadcrumb-title">Dashboard</strong>
     </div>
@@ -671,7 +671,7 @@ input[type=range]{width:100%;accent-color:var(--blue);cursor:pointer}
       <div style="display:flex;align-items:center;justify-content:space-between">
         <div>
           <div class="page-title">Dashboard</div>
-          <div class="page-subtitle">Güler Diş Kliniği &nbsp;·&nbsp; Pazartesi, 12 Mayıs 2025</div>
+          <div class="page-subtitle"><span data-clinic-name="">Güler Diş Kliniği</span> &nbsp;·&nbsp; Pazartesi, 12 Mayıs 2025</div>
         </div>
         <div style="display:flex;align-items:center;gap:8px">
           <span style="font-size:11px;color:var(--text3);font-weight:500">Son güncelleme: az önce</span>
@@ -988,7 +988,7 @@ input[type=range]{width:100%;accent-color:var(--blue);cursor:pointer}
           <div style="flex:1;min-width:0">
             <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
               <div>
-                <div id="biz-name" style="font-size:17px;font-weight:800;color:var(--text)">Güler Diş Kliniği</div>
+                <div id="biz-name" data-clinic-name="" style="font-size:17px;font-weight:800;color:var(--text)">Güler Diş Kliniği</div>
                 <div id="biz-category" style="font-size:12px;color:var(--text3);margin-top:1px">Diş Kliniği · İstanbul</div>
               </div>
               <a id="biz-maps-link" href="https://maps.google.com" target="_blank" style="display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#4285F4;text-decoration:none;white-space:nowrap;flex-shrink:0;padding:5px 10px;border:1px solid #bfdbfe;border-radius:7px;background:#eff6ff">
@@ -1676,7 +1676,7 @@ KLİNİK BİLGİLERİ:
       <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:var(--radius);padding:12px 16px;margin-bottom:20px;display:flex;align-items:center;justify-content:space-between">
         <div style="display:flex;align-items:center;gap:10px;font-size:13px;font-weight:600;color:#15803d">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-          Google Business Profile bağlı · Güler Diş Kliniği · Son güncelleme: 2 dk önce
+          Google Business Profile bağlı · <span data-clinic-name="">Güler Diş Kliniği</span> · Son güncelleme: 2 dk önce
         </div>
         <button onclick="disconnectGoogle()" style="font-size:11px;color:#dc2626;background:none;border:none;cursor:pointer;font-weight:600">Bağlantıyı Kes</button>
       </div>
@@ -1855,7 +1855,15 @@ async function loadSupabaseData() {
     console.log('[DentFlow] ' + (patients?.length||0) + ' hasta, ' + (appointments?.length||0) + ' randevu yuklendi');
     const { data: settings } = await _supabase.from('clinic_settings').select('*').eq('user_id', user.id).single();
     if (settings) {
-      if (settings.biz_name) document.getElementById('biz-name').textContent = settings.biz_name;
+      if (settings.biz_name) {
+        window._clinicName = settings.biz_name;
+        document.getElementById('biz-name').textContent = settings.biz_name;
+        document.querySelectorAll('[data-clinic-name]').forEach(el => el.textContent = settings.biz_name);
+        const gsName = document.getElementById('gs-name'); if (gsName) gsName.value = settings.biz_name;
+        const aiPrompt = document.getElementById('ai-prompt'); if (aiPrompt) aiPrompt.value = aiPrompt.value.replace(/Güler Diş Kliniği/g, settings.biz_name);
+        const initials = settings.biz_name.split(' ').map(w=>w[0]).slice(0,2).join('');
+        document.getElementById('biz-logo').textContent = initials;
+      }
       if (settings.biz_category) document.getElementById('biz-category').textContent = settings.biz_category;
       if (settings.biz_review_count) document.getElementById('biz-review-count').textContent = settings.biz_review_count + ' yorum';
       if (settings.biz_maps_link) document.getElementById('biz-maps-link').href = settings.biz_maps_link;
@@ -1864,10 +1872,12 @@ async function loadSupabaseData() {
         document.getElementById('gmaps-placeholder').style.display = 'none';
         document.getElementById('gmaps-iframe').src = settings.biz_maps_embed;
       }
-      if (settings.biz_name) {
-        const initials = settings.biz_name.split(' ').map(w=>w[0]).slice(0,2).join('');
-        document.getElementById('biz-logo').textContent = initials;
-      }
+    }
+    const { data: reviews } = await _supabase.from('google_reviews').select('*').eq('user_id', user.id);
+    if (reviews && reviews.length > 0) {
+      GOOGLE_REVIEWS.length = 0;
+      reviews.forEach(r => GOOGLE_REVIEWS.push(r));
+      buildGoogleReviews();
     }
   } catch(e) { console.error('[DentFlow] hata:', e); }
 }
@@ -2707,7 +2717,7 @@ function buildGoogleReviews() {
 function sendReviewRequest(i) {
   const c = GOOGLE_REVIEW_CANDIDATES[i];
   const reviewLink = 'https://g.page/r/guler-dis/review';
-  const defaultMsg = 'Merhaba ' + c.name.split(' ')[0] + '! 😊\n\n' + c.service + ' tedavinizin tamamlanmasından memnuniyet duyduk. Deneyiminizi Google yorumlarında paylaşır mısınız? ⭐\n\n' + reviewLink + '\n\nSağlıklı günler! 🦷\n— Güler Diş Kliniği';
+  const defaultMsg = 'Merhaba ' + c.name.split(' ')[0] + '! 😊\n\n' + c.service + ' tedavinizin tamamlanmasından memnuniyet duyduk. Deneyiminizi Google yorumlarında paylaşır mısınız? ⭐\n\n' + reviewLink + '\n\nSağlıklı günler! 🦷\n— ' + (window._clinicName || 'Güler Diş Kliniği');
   
   // Fill preview modal
   document.getElementById('wa-preview-name').textContent = c.name;
@@ -2755,25 +2765,36 @@ function sendBulkReviewRequest() {
   showToast(pending.length + ' hastaya toplu yorum isteği gönderildi!','success');
 }
 
-const AI_REPLY_TEMPLATES = [
-  'Değerli yorumunuz için teşekkür ederiz! 🙏 Memnuniyetiniz bizi mutlu etti. Tekrar görüşmek dileğiyle! 😊 — Güler Diş Kliniği',
-  'Geri bildiriminiz için çok teşekkür ederiz. Ekibimizle paylaşacağız. Sizi tekrar ağırlamaktan mutluluk duyarız! 🦷',
-  'Kıymetli yorumunuz için minnettarız. Daha iyi hizmet için sürekli çalışıyoruz. Teşekkürler! ❤️',
-];
+function getAIReplyTemplates() {
+  const n = window._clinicName || 'Güler Diş Kliniği';
+  return [
+    'Değerli yorumunuz için teşekkür ederiz! 🙏 Memnuniyetiniz bizi mutlu etti. Tekrar görüşmek dileğiyle! 😊 — ' + n,
+    'Geri bildiriminiz için çok teşekkür ederiz. Ekibimizle paylaşacağız. Sizi tekrar ağırlamaktan mutluluk duyarız! 🦷',
+    'Kıymetli yorumunuz için minnettarız. Daha iyi hizmet için sürekli çalışıyoruz. Teşekkürler! ❤️',
+  ];
+}
 
 function aiReply(i) {
   const ta = document.getElementById('reply-'+i);
-  if(ta) { ta.value = AI_REPLY_TEMPLATES[i%AI_REPLY_TEMPLATES.length]; showToast('AI yanıt oluşturuldu'); }
+  const templates = getAIReplyTemplates();
+  if(ta) { ta.value = templates[i%templates.length]; showToast('AI yanıt oluşturuldu'); }
 }
 
-function sendReply(i) {
+async function sendReply(i) {
   const ta = document.getElementById('reply-'+i);
-  if(ta && ta.value.trim()) {
-    GOOGLE_REVIEWS[i].answered = true;
-    GOOGLE_REVIEWS[i].reply = ta.value.trim().substring(0,50)+'...';
-    buildGoogleReviews();
-    showToast('Google yorumuna yanıt gönderildi!','success');
-  } else { showToast('Yanıt metni girin','error'); }
+  if (!ta || !ta.value.trim()) { showToast('Yanıt metni girin','error'); return; }
+  const replyText = ta.value.trim();
+  const review = GOOGLE_REVIEWS[i];
+  review.answered = true;
+  review.reply = replyText.substring(0,50)+'...';
+  if (_supabase && review.id) {
+    try {
+      const { data: { user } } = await _supabase.auth.getUser();
+      if (user) await _supabase.from('google_reviews').update({ answered: true, reply: replyText }).eq('id', review.id).eq('user_id', user.id);
+    } catch(e) { console.error('[DentFlow] yanıt kaydedilemedi:', e); }
+  }
+  buildGoogleReviews();
+  showToast('Google yorumuna yanıt gönderildi!','success');
 }
 
 
@@ -3054,7 +3075,7 @@ function sendReviewRequests() {
     const msg = template
       .replace(/{hasta_adi}/g, p.n.split(' ')[0])
       .replace(/{tedavi_adi}/g, p.s || 'tedaviniz')
-      .replace(/{klinik_adi}/g, 'Güler Diş Kliniği');
+      .replace(/{klinik_adi}/g, window._clinicName || 'Güler Diş Kliniği');
     sent++;
     // Show sending progress in toast
     btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg> ${sent}/${selected.length} gönderiliyor...`;
