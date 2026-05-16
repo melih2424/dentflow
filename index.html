@@ -1879,6 +1879,15 @@ async function loadSupabaseData() {
       reviews.forEach(r => GOOGLE_REVIEWS.push(r));
       buildGoogleReviews();
     }
+    const { data: igConn } = await _supabase.from('instagram_connections').select('*').eq('user_id', user.id).single();
+    if (igConn) {
+      const igUsernameEl = document.getElementById('ig-username');
+      if (igUsernameEl) igUsernameEl.value = igConn.ig_username || '';
+      const igTokenEl = document.getElementById('ig-access-token');
+      if (igTokenEl) igTokenEl.value = igConn.access_token || '';
+      const igAppIdEl = document.getElementById('ig-app-id');
+      if (igAppIdEl) igAppIdEl.value = igConn.app_id || '';
+    }
   } catch(e) { console.error('[DentFlow] hata:', e); }
 }
 
@@ -2875,7 +2884,7 @@ function testIGConnection() {
   }, 1500);
 }
 
-function saveIGConnection() {
+async function saveIGConnection() {
   const username = document.getElementById('ig-username').value.trim();
   const appId = document.getElementById('ig-app-id').value.trim();
   const token = document.getElementById('ig-access-token').value.trim();
@@ -2883,26 +2892,36 @@ function saveIGConnection() {
     showToast('En az kullanici adi ve Access Token gerekli', 'error');
     return;
   }
+  if (_supabase) {
+    const { data: { user } } = await _supabase.auth.getUser();
+    const { error } = await _supabase.from('instagram_connections').upsert({
+      user_id: user?.id,
+      ig_username: document.getElementById('ig-username')?.value?.trim(),
+      ig_account_id: '17841402729467179',
+      access_token: document.getElementById('ig-access-token')?.value?.trim(),
+      app_id: document.getElementById('ig-app-id')?.value?.trim(),
+      app_secret: ''
+    }, { onConflict: 'user_id' });
+    if (error) { showToast('Kayıt hatası: ' + error.message, 'error'); return; }
+    showToast('Instagram bağlandı!', 'success');
+  }
   const btn = event.target.closest('button');
   btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="13" height="13"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4"/></svg> Baglanıyor...';
   btn.disabled = true;
   setTimeout(() => {
     const displayName = username.startsWith('@') ? username : '@' + username;
-    // Show connected badge in header
     const badge = document.getElementById('ig-connected-badge');
     if (badge) {
       badge.textContent = '';
       badge.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg> ' + displayName;
       badge.style.display = 'flex';
     }
-    // Replace setup card with connected state
     const card = document.getElementById('ig-setup-card');
     if (card) {
       card.innerHTML = '<div style="display:flex;align-items:center;gap:14px"><div style="width:40px;height:40px;background:linear-gradient(135deg,#e1306c,#833ab4);border-radius:12px;display:flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" width="20" height="20"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg></div><div><div style="font-size:14px;font-weight:800;color:#831843">Instagram Business Bagli</div><div style="font-size:12px;color:#be185d;margin-top:2px">' + displayName + ' · Meta Graph API aktif · DM + Yorum + Reklam takibi</div></div><button onclick="disconnectIG()" style="margin-left:auto;font-size:11px;color:#dc2626;background:none;border:none;cursor:pointer;font-weight:600">Baglantıyı Kes</button></div>';
       card.style.background = 'linear-gradient(135deg,#fdf2f8,#fce7f3)';
     }
     buildInstagram();
-    showToast('Instagram Business API basariyla baglandi!', 'success');
   }, 2000);
 }
 
