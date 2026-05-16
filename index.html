@@ -1853,6 +1853,22 @@ async function loadSupabaseData() {
       if (typeof renderCalendar === 'function') renderCalendar();
     }
     console.log('[DentFlow] ' + (patients?.length||0) + ' hasta, ' + (appointments?.length||0) + ' randevu yuklendi');
+    const { data: settings } = await _supabase.from('clinic_settings').select('*').eq('user_id', user.id).single();
+    if (settings) {
+      if (settings.biz_name) document.getElementById('biz-name').textContent = settings.biz_name;
+      if (settings.biz_category) document.getElementById('biz-category').textContent = settings.biz_category;
+      if (settings.biz_review_count) document.getElementById('biz-review-count').textContent = settings.biz_review_count + ' yorum';
+      if (settings.biz_maps_link) document.getElementById('biz-maps-link').href = settings.biz_maps_link;
+      if (settings.biz_review_link) document.getElementById('biz-review-link').href = settings.biz_review_link;
+      if (settings.biz_maps_embed) {
+        document.getElementById('gmaps-placeholder').style.display = 'none';
+        document.getElementById('gmaps-iframe').src = settings.biz_maps_embed;
+      }
+      if (settings.biz_name) {
+        const initials = settings.biz_name.split(' ').map(w=>w[0]).slice(0,2).join('');
+        document.getElementById('biz-logo').textContent = initials;
+      }
+    }
   } catch(e) { console.error('[DentFlow] hata:', e); }
 }
 
@@ -3609,7 +3625,7 @@ function openGoogleSettings() {
 function closeGoogleSettings() {
   document.getElementById('modal-google-settings').style.display = 'none';
 }
-function saveGoogleSettings() {
+async function saveGoogleSettings() {
   const name = document.getElementById('gs-name').value.trim();
   const category = document.getElementById('gs-category').value.trim();
   const address = document.getElementById('gs-address').value.trim();
@@ -3640,6 +3656,21 @@ function saveGoogleSettings() {
     document.getElementById('biz-logo').textContent = initials;
   }
 
+  if (_supabase) {
+    const { data: { user } } = await _supabase.auth.getUser();
+    const { error } = await _supabase.from('clinic_settings').upsert({
+      user_id: user?.id,
+      biz_name: name,
+      biz_category: category,
+      biz_address: address,
+      biz_phone: phone,
+      biz_review_count: count,
+      biz_maps_embed: embedUrl,
+      biz_maps_link: mapsLink,
+      biz_review_link: reviewLink
+    }, { onConflict: 'user_id' });
+    if (error) { showToast('Kayıt hatası: ' + error.message, 'error'); return; }
+  }
   closeGoogleSettings();
   showToast('Firma bilgileri güncellendi!', 'success');
 }
